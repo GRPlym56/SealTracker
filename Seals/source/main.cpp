@@ -4,7 +4,7 @@
 int main()
 {
     while (true) {
-
+        ThisThread::sleep_for(500s);
     }
 }
 
