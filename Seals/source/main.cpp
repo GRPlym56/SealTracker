@@ -6,14 +6,13 @@
 
 RTC_HandleTypeDef hrtc;
 
-EventQueue PrintQueue;
-Thread PrintThread;
-Thread TestThread;
+//EventQueue PrintQueue;
+//Thread PrintThread;
+//Thread TestThread;
 DigitalOut LED(PB_3);
 
-void flash(void);
-void printer(void);
-void flashinterrupt(void);
+
+
 
 void Error_Handler(void);
 
@@ -27,14 +26,14 @@ int main()
     SystemClock_Config();
     MX_RTC_Init();
     
-    /*
-    PrintThread.start(printer);
-    TestThread.start(flash);
     
-    */
+    
+    
+    
     while(1)
     {
         HAL_PWR_EnterSLEEPMode(PWR_MAINREGULATOR_ON, PWR_SLEEPENTRY_WFI); 
+        //sleep();
     }
     
     
@@ -47,19 +46,6 @@ void flashinterrupt()
     LED = !LED;
 }
 
-void flash()
-{
-    while(1){
-        LED = !LED;
-        ThisThread::sleep_for(1s);
-    }
-}
-
-void printer()
-{
-    PrintQueue.dispatch_forever();
-    sleep();
-} 
 
 void SystemClock_Config(void) //got stm32cube to make this for me and then i nicked it
 {
@@ -68,10 +54,12 @@ void SystemClock_Config(void) //got stm32cube to make this for me and then i nic
 
   /** Configure the main internal regulator output voltage
   */
+  /*
   if (HAL_PWREx_ControlVoltageScaling(PWR_REGULATOR_VOLTAGE_SCALE1) != HAL_OK)
   {
     Error_Handler();
   }
+  */
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
@@ -81,10 +69,12 @@ void SystemClock_Config(void) //got stm32cube to make this for me and then i nic
   RCC_OscInitStruct.MSICalibrationValue = 0;
   RCC_OscInitStruct.MSIClockRange = RCC_MSIRANGE_5;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
+  /*
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
     Error_Handler();
   }
+  */
   /** Initializes the CPU, AHB and APB buses clocks
   */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
@@ -94,10 +84,12 @@ void SystemClock_Config(void) //got stm32cube to make this for me and then i nic
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
+  /*
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
   {
     Error_Handler();
   }
+  */
 }
 
 static void MX_RTC_Init(void)
@@ -120,17 +112,19 @@ static void MX_RTC_Init(void)
   hrtc.Init.OutPutRemap = RTC_OUTPUT_REMAP_NONE;
   hrtc.Init.OutPutPolarity = RTC_OUTPUT_POLARITY_HIGH;
   hrtc.Init.OutPutType = RTC_OUTPUT_TYPE_OPENDRAIN;
+  /*
   if (HAL_RTC_Init(&hrtc) != HAL_OK)
   {
     Error_Handler();
   }
+  */
   /* USER CODE BEGIN RTC_Init 2 */
 
   /* USER CODE END RTC_Init 2 */
 
 }
 
-void Error_Handler(void)
+void Error_Handler(void) //this does nothing, STM32cube thought it was a good idea ¯\_(ツ)_/¯
 {
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */

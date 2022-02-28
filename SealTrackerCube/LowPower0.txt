@@ -1,0 +1,2 @@
+Data updated (sequence saved on a STM32L432K(B-C)Ux and loaded on a STM32L432K(B-C)Ux ) 
+Warning: the battery selected ( Li-SOCL2(A3400) ) seems not compatible with loaded step(2)
