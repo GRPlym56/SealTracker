@@ -32,8 +32,10 @@ int main()
     
     while(1)
     {
-        HAL_PWR_EnterSLEEPMode(PWR_MAINREGULATOR_ON, PWR_SLEEPENTRY_WFI); 
-        //sleep();
+        //HAL_PWR_EnterSLEEPMode(PWR_MAINREGULATOR_ON, PWR_SLEEPENTRY_WFI);
+        hal_deepsleep();
+        //LED = !LED;
+        //ThisThread::sleep_for(500ms);
     }
     
     
@@ -134,3 +136,4 @@ void Error_Handler(void) //this does nothing, STM32cube thought it was a good id
   }
   /* USER CODE END Error_Handler_Debug */
 }
+
