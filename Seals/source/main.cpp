@@ -14,41 +14,33 @@ DigitalOut LED(PB_3);
 
 LowPowerTicker Tick;
 void flashinterrupt(void);
-Timer tm1;
-int SampleCounter;
+
+/*
+void Error_Handler(void);
+
+void SystemClock_Config(void);
+static void MX_RTC_Init(void);
+*/
 
 int main()
 {
-    LED = 0;
-    SampleCounter = 0;
-    //tm1.reset();
+
+    //HAL_Init();
+    //SystemClock_Config();
+    //MX_RTC_Init();
     
-    Tick.attach(flashinterrupt, 1s); //this will continuously wake the system from deep sleep to do stuff
+    Tick.attach(flashinterrupt, 2s);
     
-    //ThisThread::sleep_for(10s);
+    
+    //hal_deepsleep();
+
 
     while(1)
     {
+        //HAL_PWR_EnterSLEEPMode(PWR_MAINREGULATOR_ON, PWR_SLEEPENTRY_WFI);
         hal_deepsleep();
-        
-       
-
-        /*
-        LED = !LED;
-        tm1.start();
-        //HAL_Delay(5000);
-        ThisThread::sleep_for(5s);
-        printf("Delay: %llu \n\r", tm1.elapsed_time());
-        tm1.reset();
-        //ThisThread::sleep_for(1000ms);
-        */
-
-        /*
-        LED = 1;
-        HAL_Delay(1000);
-        LED = 0;
-        */
-
+        //LED = !LED;
+        //ThisThread::sleep_for(500ms);
     }
     
 }
@@ -56,9 +48,6 @@ int main()
 void flashinterrupt()
 {
     LED = !LED;
-    
-
-    
 }
 
 
