@@ -1,8 +1,1 @@
-{
-    "requires": ["bare-metal", "events", "lora", "mbedtls"],
-    "target_overrides": {
-        "*": {
-            "target.printf_lib": "std"
-        }
-    }
-}
+{ "requires": ["bare-metal"]}
