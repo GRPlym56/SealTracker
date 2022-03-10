@@ -1,8 +1,9 @@
 {
-    "requires": ["bare-metal", "events", "lora", "mbedtls"],
     "target_overrides": {
         "*": {
-            "target.printf_lib": "std"
+            "target.macros_add": ["MBED_TICKLESS"],
+            "target.macros_add": ["MBED_CPU_STATS_ENABLED"]
         }
     }
 }
+    
