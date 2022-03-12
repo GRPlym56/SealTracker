@@ -1,0 +1,37 @@
+Module: ELEC-35X
+Group E:  Jacob Howell, Ethan Brian, Guy Ringshaw
+
+
+Jacob Howell:
+Lead Programmer:
+Circular_Buff class (FIFO Buffer)
+SDCard class
+SensorData class
+NetworkSampleReceiver class
+SampleReciever Interface
+ConsumerContext Interface
+
+Aided with:
+main.cpp
+network class
+
+
+Ethan Brian:
+Lead Programmer:
+Alarm class
+ErrorLogger class (including watch dog timer)
+
+Aided with:
+SDCard Class
+main.cpp
+
+
+Guy Ringshaw:
+Lead programmer: 
+MatrixGraph class,
+Network Class (+ Azure Server),
+
+Aided with:
+main.cpp
+Alarm class
+ErrorLogger class
