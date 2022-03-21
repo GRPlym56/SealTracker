@@ -1,9 +1,0 @@
-{
-    "target_overrides": {
-        "*": {
-            "target.macros_add": ["MBED_TICKLESS"],
-            "target.macros_add": ["MBED_CPU_STATS_ENABLED"]
-        }
-    }
-}
-    
