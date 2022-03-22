@@ -22,12 +22,9 @@ SPDX-License-Identifier: Apache-2.0
 #include "NetworkSampleConsumer.hpp"
 #include "Matrix.hpp"
 #include "Config.hpp"
-#include "nRF24L01P.h"
 //#define TIMEOUT_MS 30000
 
 using namespace uop_msb;
-
-nRF24L01P Comms(PA_7, PA_6, PA_5, PE_11, PF_13, PE_9);
 
 
 Thread Producer, Consumers, Graph, Networking, SD_writer, WatchdogThread, SerialThread;
@@ -61,7 +58,6 @@ int main() {
     //Watchdog &watchdog = Watchdog::get_instance();
     //watchdog.start(TIMEOUT_MS); 
 
-    /*
     registerSampleConsumers();
     Producer.start(sampler);
     Producer.set_priority(osPriorityRealtime7);
@@ -75,43 +71,15 @@ int main() {
 
 
     SD_writer.start(SD_Check);
-    */
+
     //WatchdogThread.start(WatchdogChecker); // starts the watchdog thread
     //WatchdogThread.set_priority(osPriorityRealtime1); // sets the priority of the watchdog thread to highest
 
     SerialThread.start(Printer);
 
-    char txData[4], rxData[4];
-    int txDataCnt = 0;
-    int rxDataCnt = 0;
-
-
-    Comms.powerUp();
-
-    Comms.setTransferSize(4);
- 
-    Comms.setReceiveMode();
-    Comms.enable();
 
     while(1){
-        
-        if ( Comms.readable() ) {
- 
-            // ...read the data into the receive buffer
-            rxDataCnt = Comms.read( NRF24L01P_PIPE_P0, rxData, sizeof( rxData ) );
- 
-            // Display the receive buffer contents via the host serial link
-            for ( int i = 0; rxDataCnt > 0; rxDataCnt--, i++ ) {
-
-                char a = rxData[i];
-                printf("%s", a);
-            }
- 
-            // Toggle LED2 (to help debug nRF24L01+ -> Host communication)
-            //myled2 = !myled2;
-        }
-
-
+        sleep(); 
     }
     Producer.join();
     Consumers.join();
