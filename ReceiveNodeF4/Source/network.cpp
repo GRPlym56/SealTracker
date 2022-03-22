@@ -23,8 +23,8 @@ extern EventQueue PrintQueue;
 using namespace uop_msb;
 
 Network::Network():netBuff(128, "netBuff"){
-    connect(); //establish network connection
-    setTime(); //set the current time
+    //connect(); //establish network connection
+    //setTime(); //set the current time
     sendrate = 10000ms; //default sendrate 10s
 }
 

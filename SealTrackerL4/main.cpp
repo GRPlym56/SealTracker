@@ -7,10 +7,11 @@
 #include "platform/mbed_thread.h"
 #include "nRF24L01P.h"
 
+#define TRANSFER_SIZE   4
 
-Serial pc(USBTX, USBRX); // tx, rx
 
 nRF24L01P Comms(PB_5, PB_4, PB_3, PB_0, PB_1, PA_8);
+I2C MS58(PA_10, PA_9); //SDA, SCL
 
 
 void sendmsg(char msg[4]);
@@ -21,7 +22,7 @@ int main() {
 // The nRF24L01+ supports transfers from 1 to 32 bytes, but Sparkfun's
 //  "Nordic Serial Interface Board" (http://www.sparkfun.com/products/9019)
 //  only handles 4 byte transfers in the ATMega code.
-#define TRANSFER_SIZE   4
+
  
     char txData[TRANSFER_SIZE], rxData[TRANSFER_SIZE];
     int txDataCnt = 0;
@@ -30,13 +31,13 @@ int main() {
     Comms.powerUp();
  
     // Display the (default) setup of the nRF24L01+ chip
-    pc.printf( "nRF24L01+ Frequency    : %d MHz\r\n",  Comms.getRfFrequency() );
-    pc.printf( "nRF24L01+ Output power : %d dBm\r\n",  Comms.getRfOutputPower() );
-    pc.printf( "nRF24L01+ Data Rate    : %d kbps\r\n", Comms.getAirDataRate() );
-    pc.printf( "nRF24L01+ TX Address   : 0x%010llX\r\n", Comms.getTxAddress() );
-    pc.printf( "nRF24L01+ RX Address   : 0x%010llX\r\n", Comms.getRxAddress() );
+    printf( "nRF24L01+ Frequency    : %d MHz\r\n",  Comms.getRfFrequency() );
+    printf( "nRF24L01+ Output power : %d dBm\r\n",  Comms.getRfOutputPower() );
+    printf( "nRF24L01+ Data Rate    : %d kbps\r\n", Comms.getAirDataRate() );
+    printf( "nRF24L01+ TX Address   : 0x%010llX\r\n", Comms.getTxAddress() );
+    printf( "nRF24L01+ RX Address   : 0x%010llX\r\n", Comms.getRxAddress() );
  
-    pc.printf( "Type keys to test transfers:\r\n  (transfers are grouped into %d characters)\r\n", TRANSFER_SIZE );
+    printf( "Type keys to test transfers:\r\n  (transfers are grouped into %d characters)\r\n", TRANSFER_SIZE );
  
     Comms.setTransferSize( TRANSFER_SIZE );
  
@@ -45,51 +46,40 @@ int main() {
     char testsample[3][4] = {
         {'C','1','2','3'},
         {'T','4','5','6'},
-        {'P','7','8','9'}};
+        {'P','7','8','9'}
+    };
+    Comms.setTransmitMode();   
     Comms.enable();
- 
-    while (1) {
- 
-        /*
-        // If we've received anything over the host serial link...
-        if ( pc.readable() ) {
- 
-            // ...add it to the transmit buffer
-            txData[txDataCnt++] = pc.getc();
- 
-            // If the transmit buffer is full
-            if ( txDataCnt >= sizeof( txData ) ) {
- 
-                // Send the transmitbuffer via the nRF24L01+
-                Comms.write( NRF24L01P_PIPE_P0, "test", txDataCnt );
- 
-                txDataCnt = 0;
-            }
- 
-            // Toggle LED1 (to help debug Host -> nRF24L01+ communication)
-            //myled1 = !myled1;
-        }
- 
-        // If we've received anything in the nRF24L01+...
-        if ( Comms.readable() ) {
- 
-            // ...read the data into the receive buffer
-            rxDataCnt = Comms.read( NRF24L01P_PIPE_P0, rxData, sizeof( rxData ) );
- 
-            // Display the receive buffer contents via the host serial link
-            for ( int i = 0; rxDataCnt > 0; rxDataCnt--, i++ ) {
- 
-                pc.putc( rxData[i] );
-            }
- 
-            // Toggle LED2 (to help debug nRF24L01+ -> Host communication)
-            //myled2 = !myled2;
-        }
+
+    char cmd[2];
+    char PROM[2];
+    const int addr7bit = 0x76;
+    const int addr8bit = 0xEC;
+
+    const char Reset[1] = {0x1E};
+    const char ADCRead[1] = {0x00};
+    char PROMRead0[1] = {0xA0};
+    char PROMRead1[1] = {0xA2};
+    char PROMRead2[1] = {0xA4};
+    char PROMRead3[1] = {0xA6};
+    char PROMRead4[1] = {0xA8};
+    char PROMRead5[1] = {0xAA};
+    char PROMRead6[1] = {0xAC};
+
     
-    */
-        //sendsample(testsample);
+
+    MS58.frequency(400000); //400kHz SCL
+
+    MS58.write(addr7bit, Reset, 1, false); //reset
+
+    MS58.write(addr7bit, PROMRead2, 1, false);
+    MS58.read(addr7bit, PROM, 1);
+    //printf("PROM: %X", PROM);
     
-        ThisThread::sleep_for(1000);
+
+    while(1) {
+ 
+        
         
     }
 
@@ -108,6 +98,6 @@ void sendsample(char sample[3][4])
     {
         sendmsg(sample[i]); //send sample data
         sendmsg("\n\r"); //new line
-        ThisThread::sleep_for(50); //timing slack
+        ThisThread::sleep_for(50ms); //timing slack
     }
 }

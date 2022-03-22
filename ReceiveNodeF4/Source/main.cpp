@@ -28,7 +28,7 @@ SPDX-License-Identifier: Apache-2.0
 using namespace uop_msb;
 
 nRF24L01P Comms(PA_7, PA_6, PA_5, PE_11, PF_13, PE_9);
-
+DigitalOut myled(LED2);
 
 Thread Producer, Consumers, Graph, Networking, SD_writer, WatchdogThread, SerialThread;
 
@@ -104,11 +104,11 @@ int main() {
             for ( int i = 0; rxDataCnt > 0; rxDataCnt--, i++ ) {
 
                 char a = rxData[i];
-                printf("%s", a);
+                printf("%c", a);
             }
  
             // Toggle LED2 (to help debug nRF24L01+ -> Host communication)
-            //myled2 = !myled2;
+            myled = !myled;
         }
 
 
