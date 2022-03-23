@@ -20,16 +20,10 @@ MS5837 PressSens(PA_10, PA_9); //SDA, SCL
 Thread SealSumbersion;
 
 void sendmsg(char msg[]);
-void sendsample(char sample[3][4]);
 void SubmersionDetection(void);
 
 int main() {
- 
-// The nRF24L01+ supports transfers from 1 to 32 bytes, but Sparkfun's
-//  "Nordic Serial Interface Board" (http://www.sparkfun.com/products/9019)
-//  only handles 4 byte transfers in the ATMega code.
 
- 
     char txData[TRANSFER_SIZE], rxData[TRANSFER_SIZE];
     int txDataCnt = 0;
     int rxDataCnt = 0;
@@ -60,20 +54,13 @@ int main() {
     
     float temp, press;
     
-    //SealSumbersion.start(SubmersionDetection);
+    SealSumbersion.start(SubmersionDetection);
+    sendmsg("testing this is a long string!\n");
 
     while(1) {
  
-        /*
-       PressSens.Barometer_MS5837();
-       temp = PressSens.MS5837_Temperature(); 
-       press = PressSens.MS5837_Pressure();
-       printf("Temp: %f \n\r Press: %f\n\r", temp, press);
-       ThisThread::sleep_for(500ms);
-       */
-        sendmsg("testing\n\r");
+       
         
-        ThisThread::sleep_for(1000ms);
         
     }
 
@@ -93,18 +80,7 @@ void sendmsg(char msg[])
         printf("Message too long \n\r");
     }
     
-   
     
-}
-
-void sendsample(char sample[3][4])
-{
-    for(int i = 0; i<3; i++)
-    {
-        sendmsg(sample[i]); //send sample data
-        sendmsg("  \n"); //new line
-        ThisThread::sleep_for(50ms); //timing slack
-    }
 }
 
 void SubmersionDetection()
@@ -113,12 +89,17 @@ void SubmersionDetection()
     while(1)
     {
         PressSens.Barometer_MS5837();
+        ThisThread::sleep_for(100ms);
         float temp = PressSens.MS5837_Temperature(); 
         float press = PressSens.MS5837_Pressure();
-        if(temp > 19.5)
+        char data[32];
+        sprintf(data, "P: %f, T: %f\n", press, temp);
+        if(temp > 10)
         {
-            sendmsg("Seals are blubbery");
-            sendmsg("\n");
+            sendmsg("The blubbery seal has surfaced\n");
+            sendmsg(data);
+            
+            
         }else 
         {
             //seal underwater, do nothing
