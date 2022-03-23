@@ -86,15 +86,16 @@ int main() {
     int rxDataCnt = 0;
 
 
+
+    Comms.powerUp();
+    Comms.powerDown();
     Comms.powerUp();
 
-    Comms.setTransferSize(4);
+    Comms.setTransferSize(32);
  
     Comms.setReceiveMode();
     Comms.enable();
-
-    while(1){
-        
+    while (true) {
         if ( Comms.readable() ) {
  
             // ...read the data into the receive buffer
@@ -110,8 +111,6 @@ int main() {
             // Toggle LED2 (to help debug nRF24L01+ -> Host communication)
             myled = !myled;
         }
-
-
     }
     Producer.join();
     Consumers.join();
