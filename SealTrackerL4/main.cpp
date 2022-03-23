@@ -7,8 +7,9 @@
 #include "platform/mbed_thread.h"
 #include "nRF24L01P.h"
 #include "MS5837.h"
+#include "string.h"
 
-#define TRANSFER_SIZE   4
+#define TRANSFER_SIZE   32
 
 
 nRF24L01P Comms(PB_5, PB_4, PB_3, PB_0, PB_1, PA_8);
@@ -16,8 +17,11 @@ nRF24L01P Comms(PB_5, PB_4, PB_3, PB_0, PB_1, PA_8);
 MS5837 PressSens(PA_10, PA_9); //SDA, SCL
 
 
-void sendmsg(char msg[4]);
+Thread SealSumbersion;
+
+void sendmsg(char msg[]);
 void sendsample(char sample[3][4]);
+void SubmersionDetection(void);
 
 int main() {
  
@@ -30,6 +34,8 @@ int main() {
     int txDataCnt = 0;
     int rxDataCnt = 0;
  
+    Comms.powerUp(); //this seems to help sometimes
+    Comms.powerDown();
     Comms.powerUp();
  
     // Display the (default) setup of the nRF24L01+ chip
@@ -43,70 +49,51 @@ int main() {
  
     Comms.setTransferSize( TRANSFER_SIZE );
  
-    //Comms.setReceiveMode();
-    //2d arrays for sending samples 
-    char testsample[3][4] = {
-        {'C','1','2','3'},
-        {'T','4','5','6'},
-        {'P','7','8','9'}
-    };
+    
     Comms.setTransmitMode();   
     Comms.enable();
 
-    /*
-    char cmd[2];
-    char PROM[7];
-    const int addr7bit = 0x76;
-    const int addr8bit = 0xEC;
-
-    const char Reset[1] = {0x1E};
     
-    char PROMRead[7] = {0xA0, 0xA2, 0xA4, 0xA6, 0xA8, 0xAA, 0xAC}; 
-    char ADCresult[3];
-    
-
-    MS58.frequency(400000); //400kHz SCL
-
-    MS58.write(addr7bit, Reset, 1); //reset
-    //MS58.write(addr7bit, PROMRead, 2);
-    //MS58.read(addr7bit, PROM, 2);
-    //printf("PROM: %X", PROM);
    
-
-    cmd[0] = 0x48;
-    cmd[1] = 0x00;
-    MS58.write(addr7bit, cmd, 1);
-
-    cmd[0] = 0x00;
-    MS58.write(addr7bit, cmd, 1);
-    MS58.read(addr7bit, ADCresult, 3);
-
-    printf("ADC: %X \n\r", ADCresult);
-    */
 
     PressSens.MS5837Init();
     
     float temp, press;
     
+    //SealSumbersion.start(SubmersionDetection);
 
     while(1) {
  
+        /*
        PressSens.Barometer_MS5837();
        temp = PressSens.MS5837_Temperature(); 
        press = PressSens.MS5837_Pressure();
        printf("Temp: %f \n\r Press: %f\n\r", temp, press);
        ThisThread::sleep_for(500ms);
+       */
+        sendmsg("testing\n\r");
         
+        ThisThread::sleep_for(1000ms);
         
     }
 
 }
 
-void sendmsg(char msg[4])
+void sendmsg(char msg[])
 {
     
-    Comms.write( NRF24L01P_PIPE_P0, msg, 4);
-    ThisThread::sleep_for(500ms);
+    unsigned int length = strlen(msg);
+    if(length <= 32)
+    {
+        Comms.write( NRF24L01P_PIPE_P0, msg, 32);
+        ThisThread::sleep_for(25ms);
+    }
+    else
+    {
+        printf("Message too long \n\r");
+    }
+    
+   
     
 }
 
@@ -115,7 +102,28 @@ void sendsample(char sample[3][4])
     for(int i = 0; i<3; i++)
     {
         sendmsg(sample[i]); //send sample data
-        sendmsg("\n\r"); //new line
+        sendmsg("  \n"); //new line
         ThisThread::sleep_for(50ms); //timing slack
+    }
+}
+
+void SubmersionDetection()
+{
+    //i will use temperature as a demo variable for now since the device is not ready to be submerged
+    while(1)
+    {
+        PressSens.Barometer_MS5837();
+        float temp = PressSens.MS5837_Temperature(); 
+        float press = PressSens.MS5837_Pressure();
+        if(temp > 19.5)
+        {
+            sendmsg("Seals are blubbery");
+            sendmsg("\n");
+        }else 
+        {
+            //seal underwater, do nothing
+        }
+        ThisThread::sleep_for(4s);
+        
     }
 }

@@ -81,7 +81,7 @@ int main() {
 
     SerialThread.start(Printer);
 
-    char txData[4], rxData[4];
+    char txData[32], rxData[32];
     int txDataCnt = 0;
     int rxDataCnt = 0;
 
