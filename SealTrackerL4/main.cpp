@@ -6,12 +6,14 @@
 #include "mbed.h"
 #include "platform/mbed_thread.h"
 #include "nRF24L01P.h"
+#include "MS5837.h"
 
 #define TRANSFER_SIZE   4
 
 
 nRF24L01P Comms(PB_5, PB_4, PB_3, PB_0, PB_1, PA_8);
-I2C MS58(PA_10, PA_9); //SDA, SCL
+//I2C MS58(PA_10, PA_9); //SDA, SCL
+MS5837 PressSens(PA_10, PA_9); //SDA, SCL
 
 
 void sendmsg(char msg[4]);
@@ -51,34 +53,49 @@ int main() {
     Comms.setTransmitMode();   
     Comms.enable();
 
+    /*
     char cmd[2];
-    char PROM[2];
+    char PROM[7];
     const int addr7bit = 0x76;
     const int addr8bit = 0xEC;
 
     const char Reset[1] = {0x1E};
-    const char ADCRead[1] = {0x00};
-    char PROMRead0[1] = {0xA0};
-    char PROMRead1[1] = {0xA2};
-    char PROMRead2[1] = {0xA4};
-    char PROMRead3[1] = {0xA6};
-    char PROMRead4[1] = {0xA8};
-    char PROMRead5[1] = {0xAA};
-    char PROMRead6[1] = {0xAC};
-
+    
+    char PROMRead[7] = {0xA0, 0xA2, 0xA4, 0xA6, 0xA8, 0xAA, 0xAC}; 
+    char ADCresult[3];
     
 
     MS58.frequency(400000); //400kHz SCL
 
-    MS58.write(addr7bit, Reset, 1, false); //reset
-
-    MS58.write(addr7bit, PROMRead2, 1, false);
-    MS58.read(addr7bit, PROM, 1);
+    MS58.write(addr7bit, Reset, 1); //reset
+    //MS58.write(addr7bit, PROMRead, 2);
+    //MS58.read(addr7bit, PROM, 2);
     //printf("PROM: %X", PROM);
+   
+
+    cmd[0] = 0x48;
+    cmd[1] = 0x00;
+    MS58.write(addr7bit, cmd, 1);
+
+    cmd[0] = 0x00;
+    MS58.write(addr7bit, cmd, 1);
+    MS58.read(addr7bit, ADCresult, 3);
+
+    printf("ADC: %X \n\r", ADCresult);
+    */
+
+    PressSens.MS5837Init();
+    
+    float temp, press;
     
 
     while(1) {
  
+       PressSens.Barometer_MS5837();
+       temp = PressSens.MS5837_Temperature(); 
+       press = PressSens.MS5837_Pressure();
+       printf("Temp: %f \n\r Press: %f\n\r", temp, press);
+       ThisThread::sleep_for(500ms);
         
         
     }
@@ -89,6 +106,7 @@ void sendmsg(char msg[4])
 {
     
     Comms.write( NRF24L01P_PIPE_P0, msg, 4);
+    ThisThread::sleep_for(500ms);
     
 }
 
