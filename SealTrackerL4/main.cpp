@@ -54,7 +54,10 @@ int main() {
     PressSens.MS5837Init();
     
     float temp, press;
-    
+    if(sleep_manager_can_deep_sleep()) //check deep sleep
+    {
+        printf("deep sleep available \n\r");
+    }
     SealSumbersion.start(SubmersionDetection);
     sendmsg("testing this is a long string!\n");
     
