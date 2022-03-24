@@ -22,6 +22,7 @@ Thread SealSumbersion;
 void sendmsg(char msg[]);
 void SubmersionDetection(void);
 
+
 int main() {
 
     char txData[TRANSFER_SIZE], rxData[TRANSFER_SIZE];
@@ -56,10 +57,18 @@ int main() {
     
     SealSumbersion.start(SubmersionDetection);
     sendmsg("testing this is a long string!\n");
-
+    
     while(1) 
     {
- 
+        /*
+        Comms.disable();
+        Comms.powerDown();
+        ThisThread::sleep_for(5s);
+        Comms.powerUp();
+        Comms.enable();
+        ThisThread::sleep_for(5s);
+        */
+        sleep();
         
         
     }
@@ -94,8 +103,9 @@ void SubmersionDetection()
         float press = PressSens.MS5837_Pressure();
         char data[32];
         sprintf(data, "P: %f, T: %f\n", press, temp);
-        if(temp > 19)
+        if(temp > 10)
         {
+            Comms.powerUp();
             sendmsg("The blubbery seal has surfaced\n");
             sendmsg(data);
             
@@ -104,7 +114,11 @@ void SubmersionDetection()
         {
             //seal underwater, do nothing
         }
+        Comms.powerDown();
         ThisThread::sleep_for(4s);
         
     }
 }
+
+
+
