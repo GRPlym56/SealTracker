@@ -57,9 +57,9 @@ int main() {
     SealSumbersion.start(SubmersionDetection);
     sendmsg("testing this is a long string!\n");
 
-    while(1) {
+    while(1) 
+    {
  
-       
         
         
     }
@@ -89,12 +89,12 @@ void SubmersionDetection()
     while(1)
     {
         PressSens.Barometer_MS5837();
-        ThisThread::sleep_for(100ms);
+        //ThisThread::sleep_for(100ms);
         float temp = PressSens.MS5837_Temperature(); 
         float press = PressSens.MS5837_Pressure();
         char data[32];
         sprintf(data, "P: %f, T: %f\n", press, temp);
-        if(temp > 10)
+        if(temp > 19)
         {
             sendmsg("The blubbery seal has surfaced\n");
             sendmsg(data);
