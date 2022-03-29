@@ -94,6 +94,12 @@ void sendmsg(char msg[])
     
     
 }
+/*TODO
+-Sort out power distribution issue
+-Get the NRF to power down when not in use (16mA oof)
+*/
+
+
 
 void SubmersionDetection()
 {

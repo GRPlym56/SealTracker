@@ -23,14 +23,15 @@ SPDX-License-Identifier: Apache-2.0
 #include "Matrix.hpp"
 #include "Config.hpp"
 #include "nRF24L01P.h"
+#include "CommsWrapper.hpp"
 //#define TIMEOUT_MS 30000
 
 using namespace uop_msb;
 
-nRF24L01P Comms(PA_7, PA_6, PA_5, PE_11, PF_13, PE_9);
-DigitalOut myled(LED2);
+CommsWrapper RFModule(RFPINS);
 
-Thread Producer, Consumers, Graph, Networking, SD_writer, WatchdogThread, SerialThread;
+
+Thread Producer, Consumers, Graph, Networking, SD_writer, WatchdogThread, SerialThread, ReceiverThread;
 
 
 Network Azure;
@@ -54,6 +55,7 @@ void WatchdogChecker();
 
 void Printer();
 
+void Receive();
 
 int main() {
     //bool Connection = connect(); //variable there so it shuts up, maybe you want to flash an LED or something when it connects IDK
@@ -78,40 +80,16 @@ int main() {
     */
     //WatchdogThread.start(WatchdogChecker); // starts the watchdog thread
     //WatchdogThread.set_priority(osPriorityRealtime1); // sets the priority of the watchdog thread to highest
-
     SerialThread.start(Printer);
+    RFModule.InitReceiveNode();
+    
+    ReceiverThread.start(Receive);
+   
 
-    char txData[32], rxData[32];
-    int txDataCnt = 0;
-    int rxDataCnt = 0;
 
 
-
-    Comms.powerUp();
-    Comms.powerDown();
-    Comms.powerUp();
-
-    Comms.setTransferSize(32);
- 
-    Comms.setReceiveMode();
-    Comms.enable();
-    while (true) {
-        if ( Comms.readable() ) {
- 
-            // ...read the data into the receive buffer
-            rxDataCnt = Comms.read( NRF24L01P_PIPE_P0, rxData, sizeof( rxData ) );
- 
-            // Display the receive buffer contents via the host serial link
-            for ( int i = 0; rxDataCnt > 0; rxDataCnt--, i++ ) {
-
-                char a = rxData[i];
-                printf("%c", a);
-            }
- 
-            // Toggle LED2 (to help debug nRF24L01+ -> Host communication)
-            myled = !myled;
-        }
-    }
+    
+    
     Producer.join();
     Consumers.join();
     //Networking.join();
@@ -192,4 +170,9 @@ void Printer()
 {   
     PrintQueue.call(printf, "Starting Printer\n\r");
     PrintQueue.dispatch_forever();
+}
+
+void Receive()
+{
+    RFModule.ReceiveData();
 }

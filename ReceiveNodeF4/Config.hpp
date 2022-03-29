@@ -19,6 +19,7 @@ typedef struct  //template struct for SPI devices
 
 } SPIConfig_t ;
 
+
 const SPIConfig_t BMP280_Pins{
     PB_5,
     PB_4,
@@ -67,6 +68,28 @@ typedef struct{
             char date[11];
             char time[9];
 }sample_t;
+
+
+typedef struct 
+{
+    PinName mosi; 
+    PinName miso; 
+    PinName sck; 
+    PinName csn;
+    PinName ce;
+    PinName irq;
+} NRFPINS;
+
+const NRFPINS RFPINS
+{
+    PA_7, 
+    PA_6, 
+    PA_5, 
+    PE_11, 
+    PF_13, 
+    PE_9
+
+};
 
 const PinName BLUEBUTTON = PC_13;
 const PinName WARNINGLIGHT = PC_3;
