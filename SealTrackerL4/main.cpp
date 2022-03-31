@@ -12,9 +12,11 @@
 #define TRANSFER_SIZE   32
 
 
-nRF24L01P Comms(PB_5, PB_4, PB_3, PB_0, PB_1, PA_8);
+nRF24L01P Comms(PB_5, PB_4, PB_3, PA_4, PB_1, PA_8);
 //I2C MS58(PA_10, PA_9); //SDA, SCL
 MS5837 PressSens(PA_10, PA_9); //SDA, SCL
+
+
 
 
 Thread SealSumbersion;
@@ -25,6 +27,11 @@ void SubmersionDetection(void);
 
 int main() {
 
+    /*
+        MAKE SURE BUILD PROFILE IN MBED STUDIO IS SET TO DEVELOP, OTHERWISE THE BOARD WILL NOT DEEP SLEEP
+        this reduces average current by approx 6mA
+    */
+   
     char txData[TRANSFER_SIZE], rxData[TRANSFER_SIZE];
     int txDataCnt = 0;
     int rxDataCnt = 0;
@@ -63,16 +70,8 @@ int main() {
     
     while(1) 
     {
-        /*
-        Comms.disable();
-        Comms.powerDown();
-        ThisThread::sleep_for(5s);
-        Comms.powerUp();
-        Comms.enable();
-        ThisThread::sleep_for(5s);
-        */
-        sleep();
-        
+
+        ThisThread::sleep_for(100s);
         
     }
 
@@ -115,15 +114,19 @@ void SubmersionDetection()
         if(temp > 10)
         {
             Comms.powerUp();
-            sendmsg("The blubbery seal has surfaced\n");
+            ThisThread::sleep_for(5ms); //timing slack or something
+            //sendmsg("The blubbery seal has surfaced\n");
             sendmsg(data);
+            //powerdown sequence (saves ~7mA)
+            Comms.powerDown();
+            Comms.disable();
             
             
         }else 
         {
             //seal underwater, do nothing
         }
-        Comms.powerDown();
+        
         ThisThread::sleep_for(4s);
         
     }
