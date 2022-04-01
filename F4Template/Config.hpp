@@ -6,7 +6,7 @@ December-January 2022
 #ifndef _CONFIG_H__
 #define _CONFIG_H__
 #include "mbed.h"
-#include "uop_msb.h"
+//#include "uop_msb.h"
 
 
 typedef struct  //template struct for SPI devices

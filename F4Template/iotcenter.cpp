@@ -115,7 +115,8 @@ static int on_method_callback(const char* method_name, const unsigned char* payl
 }
 
 void azureDemo() {
-    bool trace_on = MBED_CONF_APP_IOTHUB_CLIENT_TRACE;
+    //bool trace_on = MBED_CONF_APP_IOTHUB_CLIENT_TRACE;
+    bool trace_on = 0;
     tickcounter_ms_t interval = 100;
     IOTHUB_CLIENT_RESULT res;
 
