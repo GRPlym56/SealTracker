@@ -117,6 +117,7 @@ void SubmersionDetection()
             ThisThread::sleep_for(5ms); //timing slack or something
             //sendmsg("The blubbery seal has surfaced\n");
             sendmsg(data);
+            printf("Message: %s \r", data);
             //powerdown sequence (saves ~7mA)
             Comms.powerDown();
             Comms.disable();

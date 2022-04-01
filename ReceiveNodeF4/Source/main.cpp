@@ -86,7 +86,10 @@ int main() {
     ReceiverThread.start(Receive);
    
 
-
+    while(1)
+    {
+        sleep();
+    }
 
     
     
