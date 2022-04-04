@@ -82,10 +82,10 @@ typedef struct
 
 const NRFPINS RFPINS
 {
-    PA_7, 
-    PA_6, 
-    PA_5, 
-    PE_11, 
+    PE_14,
+    PE_13,
+    PE_12,
+    PE_11,
     PF_13, 
     PE_9
 
