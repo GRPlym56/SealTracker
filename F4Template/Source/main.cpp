@@ -1,18 +1,19 @@
 #include "mbed.h"
 #include "nRF24L01P.h"
 #include "CommsWrapper.hpp"
-//#include "network.hpp"
+#include "Azure.hpp"
 #include "Config.hpp"
+#include "SDWrapper.hpp"
 
  
 
-#define TRANSFER_SIZE   32
+
 
 //Network Azure;
 //NetworkSampleConsumer AzureConsumer(&Azure);
 
 CommsWrapper RFModule(RFPINS);
-
+SDCARD microSD(SDpins);
 
 EventQueue PrintQueue;
 Thread RFThread;
