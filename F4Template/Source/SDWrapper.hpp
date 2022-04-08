@@ -9,6 +9,15 @@
 #include "../mbed-os/storage/filesystem/fat/include/fat/FATFileSystem.h"
 #include "Config.hpp"
 
+
+#if (MBED_CONF_RTOS_PRESENT == 1)
+#if (MBED_CONF_SD_FSFAT_SDCARD_INSTALLED == 1)
+#define USE_SD_CARD
+#define BLOCK_SIZE 64
+#define LINE_WIDTH 40
+#endif
+#endif
+
 extern EventQueue PrintQueue;
 
 
@@ -20,6 +29,7 @@ class SDCARD
         SDCARD(SPIConfig_t pins);
         ~SDCARD();
         void Test(void);
+        int WriteSample(void);
 
     private:
 
@@ -27,6 +37,7 @@ class SDCARD
     SDBlockDevice SD;
     FATFileSystem fs;
     FILE *fp;
+    FILE *fsmp;
 
 };
 
