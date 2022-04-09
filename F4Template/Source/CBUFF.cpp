@@ -1,0 +1,173 @@
+#include "CBUFF.hpp"
+#include <algorithm>
+
+CircBuff::CircBuff(unsigned int buffsize, char * buffername): max_size(buffsize), name(buffername), Full(0) 
+{
+
+    Buffer = new sealsample_t [buffsize]; //allocate some memory for the new buffer
+    PrintQueue.call(printf, "New buffer %s, Size: %d\n\r", name, buffsize);
+
+}
+
+
+void CircBuff::Put(sealsample_t newsample)
+{
+    
+    //put a sample onto the buffer
+    if(Bufferlock.trylock_for(5s))
+    {
+        if(FullCheck())
+        {
+            //buffer is full, overwrite oldest sample and update tail to represent next oldest sample
+            IncrementTail();
+            Buffer[head] = newsample;
+            IncrementHead();
+            //no need to change current size as buffer is full
+
+        }else 
+        {
+            Buffer[head] = newsample;
+            IncrementHead();
+            currentsize++;
+            
+        }
+        
+        PrintQueue.call(printf, "%s Buffer Put: Size: %d, Head: %d, Tail: %d", name, currentsize, head, tail);
+        Bufferlock.unlock();
+    }else 
+    {
+        PrintQueue.call(printf, "%s Fault: 'Put' trylock failed\n\r", name);
+    }
+    
+
+
+}
+
+sealsample_t CircBuff::Get() //return a sample from the buffer and increment tail
+{
+    
+    sealsample_t returnsample;
+    if(Bufferlock.trylock_for(5s))
+    {
+        if(EmptyCheck()) //check if buffer is empty
+        {
+            //do nothing, buffer is empty
+
+        }else
+        {
+            //buffer isnt empty, return sample
+            returnsample = Buffer[tail];
+            IncrementTail();
+            currentsize--; //decrement size counter
+            
+        }
+        
+
+
+        PrintQueue.call(printf, "%s Buffer Get: Size: %d, Head: %d, Tail: %d", name, currentsize, head, tail);
+        Bufferlock.unlock();
+    }else 
+    {
+        PrintQueue.call(printf, "%s Fault: 'Get' trylock failed\n\r", name);
+    }
+    return returnsample;
+}
+
+sealsample_t CircBuff::Peek()
+{
+    //return sample but dont increment tail
+    sealsample_t returnsample;
+    if(Bufferlock.trylock_for(5s))
+    {
+        if(EmptyCheck()) //check if buffer is empty
+        {
+            //do nothing, buffer is empty
+
+        }else
+        {
+            //buffer isnt empty, return sample
+            returnsample = Buffer[tail];
+            //IncrementTail();
+            //currentsize--; //decrement size counter
+        }
+        
+
+
+        PrintQueue.call(printf, "%s Buffer Peek: Size: %d, Head: %d, Tail: %d", name, currentsize, head, tail);
+        Bufferlock.unlock();
+    }else 
+    {
+        PrintQueue.call(printf, "%s Fault: 'Peek' trylock failed\n\r", name);
+    }
+    return returnsample;
+}
+
+unsigned int CircBuff::getsize(void)
+{
+    return currentsize;
+}
+
+bool CircBuff::FullCheck(void)
+{
+    if(currentsize == max_size)
+    {
+        return 1; //buffer full
+        PrintQueue.call(printf, "%s buffer full\n\r", name);
+    }else 
+    {
+        return 0; //buffer not full
+    }
+    
+}
+
+bool CircBuff::EmptyCheck(void)
+{
+    if(currentsize == 0)
+    {
+        return 1; //buffer empty
+        PrintQueue.call(printf, "%s buffer empty\n\r", name);
+    }else 
+    {
+        return 0; //buffer not empty
+    }
+}
+
+void CircBuff::IncrementHead(void)
+{
+    if((head + 1) % max_size) //returns 1 if pointer wraps around
+    {
+        head = 0; //however we want the start of the buffer, 0 not 1
+    }else  
+    {
+        head++;
+    }
+    
+}
+
+void CircBuff::IncrementTail(void)
+{
+    if((tail + 1) % max_size) //returns 1 if pointer wraps around
+    {
+        tail = 0; //however we want the start of the buffer, 0 not 1
+    }else  
+    {
+        tail++;
+    }
+    
+}
+
+/*
+//increment in place, test later
+void CircBuff::IncrementPointer(unsigned int& pointer)
+{
+    if((pointer + 1) % max_size) //returns 1 if pointer wraps around
+    {
+        pointer = 0; //however we want the start of the buffer, 0 not 1
+    }else  //r
+    {
+        pointer++;
+    }
+    
+}
+*/
+

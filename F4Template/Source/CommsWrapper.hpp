@@ -4,7 +4,9 @@
 #include "mbed.h"
 #include "nRF24L01P.h"
 #include "Config.hpp"
+#include "CBUFF.hpp"
 extern EventQueue PrintQueue;
+extern CircBuff SampleBuffer;
 
 
 class CommsWrapper

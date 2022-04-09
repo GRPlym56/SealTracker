@@ -4,6 +4,7 @@
 #include "Azure.hpp"
 #include "Config.hpp"
 #include "SDWrapper.hpp"
+#include "CBUFF.hpp"
 
  
 /*
@@ -18,6 +19,8 @@ add peek function in case something else needs them later
 
 //Network Azure;
 //NetworkSampleConsumer AzureConsumer(&Azure);
+
+CircBuff SampleBuffer(512, "MainBuff");
 
 CommsWrapper RFModule(RFPINS);
 SDCARD microSD(SDpins);

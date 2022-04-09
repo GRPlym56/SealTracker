@@ -69,6 +69,13 @@ typedef struct{
             char time[9];
 }sample_t;
 
+typedef struct 
+{
+    float temp;
+    float light;
+
+} sealsample_t;
+
 
 typedef struct 
 {

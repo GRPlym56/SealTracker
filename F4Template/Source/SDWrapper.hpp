@@ -2,6 +2,7 @@
 #define __SDWRAPPER_HPP__
 
 #include "mbed.h"
+#include "CBUFF.hpp"
 #include "../mbed-os/storage/blockdevice/COMPONENT_SD/include/SD/SDBlockDevice.h" //:D
 
 
@@ -19,7 +20,7 @@
 #endif
 
 extern EventQueue PrintQueue;
-
+extern CircBuff SampleBuffer;
 
 class SDCARD 
 {
