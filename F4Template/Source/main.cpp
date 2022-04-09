@@ -22,12 +22,13 @@ add peek function in case something else needs them later
 
 CircBuff SampleBuffer(512, "MainBuff");
 
-CommsWrapper RFModule(RFPINS);
+CommsWrapper RFModule(RFPINS, PB_7);
 SDCARD microSD(SDpins);
 
 EventQueue PrintQueue;
 Thread RFThread;
 Thread PrintThread;
+
 
  
 void ReceiveData(void);
@@ -45,7 +46,9 @@ int main() {
 
     while (1)
     {
-        sleep();
+        ThisThread::sleep_for(60s);
+        
+        microSD.flush();
     }
 
 }
@@ -59,3 +62,4 @@ void Printer()
 {
     PrintQueue.dispatch_forever();
 }
+

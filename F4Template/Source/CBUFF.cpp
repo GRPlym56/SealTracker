@@ -32,7 +32,7 @@ void CircBuff::Put(sealsample_t newsample)
             
         }
         
-        PrintQueue.call(printf, "%s Buffer Put: Size: %d, Head: %d, Tail: %d", name, currentsize, head, tail);
+        PrintQueue.call(printf, "%s Buffer Put: Size: %d, Head: %d, Tail: %d\n\r", name, currentsize, head, tail);
         Bufferlock.unlock();
     }else 
     {
@@ -64,7 +64,7 @@ sealsample_t CircBuff::Get() //return a sample from the buffer and increment tai
         
 
 
-        PrintQueue.call(printf, "%s Buffer Get: Size: %d, Head: %d, Tail: %d", name, currentsize, head, tail);
+        PrintQueue.call(printf, "%s Buffer Get: Size: %d, Head: %d, Tail: %d\n\r", name, currentsize, head, tail);
         Bufferlock.unlock();
     }else 
     {
@@ -93,7 +93,7 @@ sealsample_t CircBuff::Peek()
         
 
 
-        PrintQueue.call(printf, "%s Buffer Peek: Size: %d, Head: %d, Tail: %d", name, currentsize, head, tail);
+        PrintQueue.call(printf, "%s Buffer Peek: Size: %d, Head: %d, Tail: %d\n\r", name, currentsize, head, tail);
         Bufferlock.unlock();
     }else 
     {
@@ -122,6 +122,7 @@ bool CircBuff::FullCheck(void)
 
 bool CircBuff::EmptyCheck(void)
 {
+   
     if(currentsize == 0)
     {
         return 1; //buffer empty
@@ -130,11 +131,13 @@ bool CircBuff::EmptyCheck(void)
     {
         return 0; //buffer not empty
     }
+
+        
 }
 
 void CircBuff::IncrementHead(void)
 {
-    if((head + 1) % max_size) //returns 1 if pointer wraps around
+    if(head == max_size) //returns 1 if pointer wraps around
     {
         head = 0; //however we want the start of the buffer, 0 not 1
     }else  
@@ -146,7 +149,7 @@ void CircBuff::IncrementHead(void)
 
 void CircBuff::IncrementTail(void)
 {
-    if((tail + 1) % max_size) //returns 1 if pointer wraps around
+    if(tail == max_size) //returns 1 if pointer wraps around
     {
         tail = 0; //however we want the start of the buffer, 0 not 1
     }else  
@@ -154,6 +157,11 @@ void CircBuff::IncrementTail(void)
         tail++;
     }
     
+}
+
+unsigned int CircBuff::GetSize(void)
+{
+    return currentsize;
 }
 
 /*

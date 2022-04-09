@@ -6,6 +6,9 @@ December-January 2022
 #ifndef _CONFIG_H__
 #define _CONFIG_H__
 #include "mbed.h"
+#include <iostream>
+#include <string>
+
 //#include "uop_msb.h"
 
 
@@ -71,8 +74,8 @@ typedef struct{
 
 typedef struct 
 {
-    float temp;
-    float light;
+    std::string pressure;
+    std::string temperature;
 
 } sealsample_t;
 

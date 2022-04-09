@@ -19,7 +19,8 @@ class CircBuff
         void Put(sealsample_t newsample);
         sealsample_t Get(void);
         sealsample_t Peek(void);
-        
+        bool EmptyCheck(void);
+        unsigned int GetSize(void);
         
 
     
@@ -45,7 +46,7 @@ class CircBuff
         void IncrementHead(void);
         void IncrementTail(void);
         bool FullCheck();
-        bool EmptyCheck(void);
+        
         unsigned int getsize(void);
         //void IncrementPointer(unsigned int& pointer);
        

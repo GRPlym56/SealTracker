@@ -31,6 +31,7 @@ class SDCARD
         ~SDCARD();
         void Test(void);
         int WriteSample(void);
+        int flush();
 
     private:
 

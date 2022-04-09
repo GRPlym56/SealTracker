@@ -5,6 +5,9 @@
 #include "nRF24L01P.h"
 #include "Config.hpp"
 #include "CBUFF.hpp"
+#include <iostream>
+#include <string>
+
 extern EventQueue PrintQueue;
 extern CircBuff SampleBuffer;
 
@@ -13,7 +16,7 @@ class CommsWrapper
 {
     public:
 
-    CommsWrapper(NRFPINS pins);
+    CommsWrapper(NRFPINS pins, DigitalOut CommsLED);
     void ReceiveData();
     void InitSendNode();
     void InitReceiveNode();
@@ -25,7 +28,11 @@ class CommsWrapper
     int txDataCnt = 0;
     int rxDataCnt = 0;
 
-    DigitalOut CommsLED;
+    DigitalOut LED;
+    sealsample_t rxDataFormatted;
+
+    
+    void Decode();
     
     
     

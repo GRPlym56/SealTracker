@@ -3,7 +3,7 @@
  
 
 #define TRANSFER_SIZE   32
-nRF24L01P my_nrf24l01p(PA_7, PA_6, PA_5, PE_11, PF_13, PE_9);    // mosi, miso, sck, csn, ce, irq
+nRF24L01P my_nrf24l01p(PE_14, PE_13, PE_12, PE_11, PF_13, PE_9);    // mosi, miso, sck, csn, ce, irq
  
 DigitalOut myled1(LED1);
 DigitalOut myled2(LED2);
@@ -20,6 +20,7 @@ int main() {
     int rxDataCnt = 0;
  
     my_nrf24l01p.powerUp();
+    my_nrf24l01p.setAirDataRate(NRF24L01P_DATARATE_250_KBPS);
  
     // Display the (default) setup of the nRF24L01+ chip
     printf( "nRF24L01+ Frequency    : %d MHz\r\n",  my_nrf24l01p.getRfFrequency() );
@@ -33,6 +34,7 @@ int main() {
     my_nrf24l01p.setTransferSize( TRANSFER_SIZE );
  
     my_nrf24l01p.setReceiveMode();
+    
     my_nrf24l01p.enable();
 
     while (1)

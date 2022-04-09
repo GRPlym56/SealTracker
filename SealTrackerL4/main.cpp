@@ -36,10 +36,9 @@ int main() {
     int txDataCnt = 0;
     int rxDataCnt = 0;
  
-    Comms.powerUp(); //this seems to help sometimes
-    Comms.powerDown();
+    
     Comms.powerUp();
- 
+    Comms.setAirDataRate(NRF24L01P_DATARATE_250_KBPS);
     // Display the (default) setup of the nRF24L01+ chip
     printf( "nRF24L01+ Frequency    : %d MHz\r\n",  Comms.getRfFrequency() );
     printf( "nRF24L01+ Output power : %d dBm\r\n",  Comms.getRfOutputPower() );
@@ -53,6 +52,7 @@ int main() {
  
     
     Comms.setTransmitMode();   
+    
     Comms.enable();
 
     
@@ -110,12 +110,14 @@ void SubmersionDetection()
         float temp = PressSens.MS5837_Temperature(); 
         float press = PressSens.MS5837_Pressure();
         char data[32];
-        sprintf(data, "P: %f, T: %f\n", press, temp);
+        sprintf(data, "%f|%f\n", press, temp); //format data
+        //sprintf(data, "P: %f, T: %f\n", press, temp); //format data
         if(temp > 10)
         {
             Comms.powerUp();
             ThisThread::sleep_for(5ms); //timing slack or something
             //sendmsg("The blubbery seal has surfaced\n");
+            //sendmsg("P: 1005.799988, T: 21.110001\n");
             sendmsg(data);
             printf("Message: %s \r", data);
             //powerdown sequence (saves ~7mA)
