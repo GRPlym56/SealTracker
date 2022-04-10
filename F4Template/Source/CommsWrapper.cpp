@@ -4,6 +4,7 @@ CommsWrapper::CommsWrapper(NRFPINS Pins, DigitalOut CommsLED): Comms(Pins.mosi, 
 {
     //init sequence
     Comms.powerUp();
+    
     printf("Comms powerup\n\r"); 
 }
 
@@ -79,7 +80,8 @@ void CommsWrapper::Decode()
         {
             rxDataFormatted.temperature = token;
         }
-            s.erase(0, pos + delimiter.length());
+        s.erase(0, pos + delimiter.length());
+        count++;
     }
     SampleBuffer.Put(rxDataFormatted);
     

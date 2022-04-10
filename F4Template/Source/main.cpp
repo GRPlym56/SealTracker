@@ -22,10 +22,11 @@ add peek function in case something else needs them later
 
 CircBuff SampleBuffer(512, "MainBuff");
 
+EventQueue PrintQueue;
 CommsWrapper RFModule(RFPINS, PB_7);
 SDCARD microSD(SDpins);
 
-EventQueue PrintQueue;
+
 Thread RFThread;
 Thread PrintThread;
 

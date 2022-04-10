@@ -30,7 +30,6 @@ class SDCARD
         SDCARD(SPIConfig_t pins);
         ~SDCARD();
         void Test(void);
-        int WriteSample(void);
         int flush();
 
     private:
@@ -38,8 +37,14 @@ class SDCARD
 
     SDBlockDevice SD;
     FATFileSystem fs;
-    FILE *fp;
+    FILE *ftest;
     FILE *fsmp;
+    FILE *samplefile; //file for samples
+    
+
+    char fileName[20] = "/sd/Samples.csv";
+    
+    
 
 };
 
