@@ -20,7 +20,7 @@ add peek function in case something else needs them later
 //Network Azure;
 //NetworkSampleConsumer AzureConsumer(&Azure);
 
-CircBuff SampleBuffer(512, "MainBuff");
+CircBuff SampleBuffer(20, "MainBuff");
 
 EventQueue PrintQueue;
 CommsWrapper RFModule(RFPINS, PB_7);

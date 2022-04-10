@@ -31,8 +31,9 @@ class CircBuff
         Mutex Bufferlock; //Mutex lock for handling mutable data 
 
         
-        bool Full;
+        
         const unsigned int max_size;          //size of buffer
+        const unsigned int max_index;
         volatile unsigned int head = 0;           //first element in buffer
         volatile unsigned int tail = 0;           //last element in buffer              //needs to be mutex locked 
         volatile unsigned int currentsize = 0;

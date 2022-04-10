@@ -1,11 +1,12 @@
 #include "CBUFF.hpp"
 #include <algorithm>
 
-CircBuff::CircBuff(unsigned int buffsize, char * buffername): max_size(buffsize), name(buffername), Full(0) 
+CircBuff::CircBuff(unsigned int buffsize, char * buffername): max_size(buffsize), max_index(buffsize-1), name(buffername)
 {
 
     Buffer = new sealsample_t [buffsize]; //allocate some memory for the new buffer
     PrintQueue.call(printf, "New buffer %s, Size: %d\n\r", name, buffsize);
+
 
 }
 
@@ -91,8 +92,6 @@ sealsample_t CircBuff::Peek()
             //currentsize--; //decrement size counter
         }
         
-
-
         PrintQueue.call(printf, "%s Buffer Peek: Size: %d, Head: %d, Tail: %d\n\r", name, currentsize, head, tail);
         Bufferlock.unlock();
     }else 
@@ -137,7 +136,7 @@ bool CircBuff::EmptyCheck(void)
 
 void CircBuff::IncrementHead(void)
 {
-    if(head == max_size) //returns 1 if pointer wraps around
+    if(head == max_index) //returns 1 if pointer wraps around
     {
         head = 0; //however we want the start of the buffer, 0 not 1
     }else  
@@ -149,7 +148,7 @@ void CircBuff::IncrementHead(void)
 
 void CircBuff::IncrementTail(void)
 {
-    if(tail == max_size) //returns 1 if pointer wraps around
+    if(tail == max_index) //returns 1 if pointer wraps around
     {
         tail = 0; //however we want the start of the buffer, 0 not 1
     }else  
