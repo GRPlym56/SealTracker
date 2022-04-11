@@ -110,7 +110,7 @@ void SubmersionDetection()
         float temp = PressSens.MS5837_Temperature(); 
         float press = PressSens.MS5837_Pressure();
         char data[32];
-        sprintf(data, "%3.1f|%2.1f|\n", press, temp); //format data
+        sprintf(data, "%5.1f|%2.1f|\n", press, temp); //format data
         //sprintf(data, "P: %f, T: %f\n", press, temp); //format data
         if(temp > 10)
         {

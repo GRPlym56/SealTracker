@@ -1,6 +1,6 @@
 #include "SDWrapper.hpp"
 
-SDCARD::SDCARD(SPIConfig_t pins): SD(pins.MOSI, SDpins.MISO, SDpins.SCLK, SDpins.CS), fs("sd", &SD)
+SDCARD::SDCARD(SPIConfig_t pins, CircBuff* SDBuff): SD(pins.MOSI, SDpins.MISO, SDpins.SCLK, SDpins.CS), fs("sd", &SD), SDBuffer(SDBuff)
 {
 
     //FATFileSystem fs("sd", &SD);
@@ -110,10 +110,10 @@ int SDCARD::flush() //flush all samples from buffer to
     {
         
         //Put some data in the file...
-        unsigned int size = SampleBuffer.GetSize();
+        unsigned int size = SDBuffer->GetSize();
         for(int i = 0; i<size; i++) //loop for as many samples as we have
         { 
-            output = SampleBuffer.Get();
+            output = SDBuffer->Get();
             //PrintQueue.call(printf, "Write to SD: %s, %s\n\r", output.pressure.c_str(), output.temperature.c_str()); //write each n byte line
             /*
             fprintf(fp, "%s\n", output.pressure.c_str()); //write each n byte line

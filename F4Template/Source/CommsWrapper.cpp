@@ -1,6 +1,6 @@
 #include "CommsWrapper.hpp"
 
-CommsWrapper::CommsWrapper(NRFPINS Pins, DigitalOut CommsLED): Comms(Pins.mosi, Pins.miso, Pins.sck, Pins.csn, Pins.ce, Pins.irq), LED(CommsLED)
+CommsWrapper::CommsWrapper(NRFPINS Pins, DigitalOut CommsLED, CircBuff* SD, CircBuff* Net): Comms(Pins.mosi, Pins.miso, Pins.sck, Pins.csn, Pins.ce, Pins.irq), LED(CommsLED), sdbuff(SD), netbuff(Net) 
 {
     //init sequence
     Comms.powerUp();
@@ -52,9 +52,9 @@ void CommsWrapper::ReceiveData()
             }
            
             PrintQueue.call(printf, "%s", rxData);
-            Decode();
-            // Toggle LED2 (to help debug nRF24L01+ -> Host communication)
             
+            // Toggle LED2 (to help debug nRF24L01+ -> Host communication)
+            Decode();
             LED = !LED;
         }
     }
@@ -83,6 +83,8 @@ void CommsWrapper::Decode()
         s.erase(0, pos + delimiter.length());
         count++;
     }
-    SampleBuffer.Put(rxDataFormatted);
+    //put newly acquired date on appropriate buffers
+    sdbuff->Put(rxDataFormatted); 
+    netbuff->Put(rxDataFormatted);
     
 }

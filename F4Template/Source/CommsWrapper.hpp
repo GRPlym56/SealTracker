@@ -9,17 +9,18 @@
 #include <string>
 
 extern EventQueue PrintQueue;
-extern CircBuff SampleBuffer;
+
 
 
 class CommsWrapper
 {
     public:
 
-    CommsWrapper(NRFPINS pins, DigitalOut CommsLED);
+    CommsWrapper(NRFPINS pins, DigitalOut CommsLED, CircBuff* SD, CircBuff* Net);
     void ReceiveData();
     void InitSendNode();
     void InitReceiveNode();
+    void Decode();
 
     private:
 
@@ -31,8 +32,9 @@ class CommsWrapper
     DigitalOut LED;
     sealsample_t rxDataFormatted;
 
+    CircBuff* sdbuff;
+    CircBuff* netbuff;
     
-    void Decode();
     
     
     

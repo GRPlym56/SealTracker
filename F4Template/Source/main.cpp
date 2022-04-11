@@ -6,34 +6,23 @@
 #include "SDWrapper.hpp"
 #include "CBUFF.hpp"
 
- 
-/*
-TODO
-add buffer for samples
-Commswrapper puts samples on the buffer
-SD takes them off
-add peek function in case something else needs them later
-
-*/
-
-
-//Network Azure;
-//NetworkSampleConsumer AzureConsumer(&Azure);
-
-CircBuff SampleBuffer(20, "MainBuff");
 
 EventQueue PrintQueue;
-CommsWrapper RFModule(RFPINS, PB_7);
-SDCARD microSD(SDpins);
+CircBuff SDBuffer(256, "SDBuff");
+CircBuff NetBuffer(256, "NetBuff");
 
+SDCARD microSD(SDpins, &SDBuffer);
+Azure Net(&NetBuffer);
+CommsWrapper RFModule(RFPINS, PB_7, &SDBuffer, &NetBuffer);
 
 Thread RFThread;
 Thread PrintThread;
+Thread AzureThread;
 
-
- 
-void ReceiveData(void);
+void ReceiveData();
 void Printer();
+void Networking();
+
 
 int main() {
 
@@ -41,7 +30,8 @@ int main() {
     PrintThread.start(Printer);
     RFModule.InitReceiveNode();
     RFThread.start(ReceiveData);
-    
+    AzureThread.start(Networking);
+
     microSD.Test();
     
 
@@ -49,7 +39,7 @@ int main() {
     {
         ThisThread::sleep_for(60s);
         
-        microSD.flush();
+        
     }
 
 }
@@ -64,3 +54,7 @@ void Printer()
     PrintQueue.dispatch_forever();
 }
 
+void Networking()
+{
+    Net.SendData();
+}

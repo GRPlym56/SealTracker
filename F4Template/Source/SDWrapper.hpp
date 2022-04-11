@@ -20,17 +20,18 @@
 #endif
 
 extern EventQueue PrintQueue;
-extern CircBuff SampleBuffer;
+
 
 class SDCARD 
 {
 
     public:
 
-        SDCARD(SPIConfig_t pins);
+        SDCARD(SPIConfig_t pins, CircBuff* SDBuff);
         ~SDCARD();
         void Test(void);
         int flush();
+        CircBuff* SDBuffer;
 
     private:
 
