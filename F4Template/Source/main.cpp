@@ -5,6 +5,7 @@
 #include "Config.hpp"
 #include "SDWrapper.hpp"
 #include "CBUFF.hpp"
+#include <ratio>
 
 
 EventQueue PrintQueue;
@@ -38,7 +39,7 @@ int main() {
     while (1)
     {
         ThisThread::sleep_for(60s);
-        
+        microSD.flush();
         
     }
 

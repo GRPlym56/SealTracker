@@ -84,7 +84,8 @@ void CommsWrapper::Decode()
         count++;
     }
     //put newly acquired date on appropriate buffers
+    
     sdbuff->Put(rxDataFormatted); 
     netbuff->Put(rxDataFormatted);
-    
+
 }

@@ -15,7 +15,7 @@ Azure::Azure(CircBuff* NetBuff): NetBuffer(NetBuff)
     Connect();
     
     setTime();
-    Sendrate = 60s;
+    Sendrate = 10s;
     
 
 }
@@ -130,6 +130,11 @@ void Azure::SendData() {
     // or until we receive a message from the cloud
     IOTHUB_MESSAGE_HANDLE message_handle;
     char message[80];
+
+    /*
+        MAKE THIS WAIT ON A SIGNAL INSTEAD OF JUST POLLING AS THAT PROBABLY ISNT A VERY GOOD WAY OF DOING IT
+    */
+
     while(1){
         if (message_received) {
             // If we have received a message from the cloud, don't send more messeges
@@ -139,36 +144,40 @@ void Azure::SendData() {
         {
             //check if we actually have any data to send to Azure first
             PrintQueue.call(printf, "Netbuff empty, nothing to send\n");
-            break;
-        }
-        //Send data in this format:
-        /*
-            {
-                "Pressure" : 1000.5,
-                "Temperature" : 21.3
+            ThisThread::sleep_for(4s); //check again after a few seconds
+        }else 
+        {
+                //Send data in this format:
+            /*
+                {
+                    "Pressure" : 1000.5,
+                    "Temperature" : 21.3
+                }
+
+            */
+            sealsample_t outputData = NetBuffer->Get(); //get samples from buffer 
+            
+            sprintf(message, "{ \"Pressure\" : %s, \"Temperature\" : %s }", outputData.pressure.c_str(), outputData.temperature.c_str());
+            LogInfo("Sending: \"%s\"", message);
+
+            message_handle = IoTHubMessage_CreateFromString(message);
+            if (message_handle == nullptr) {
+                LogError("Failed to create message");
+                goto cleanup;
             }
 
-        */
-        sealsample_t outputData = NetBuffer->Get(); //get samples from buffer 
+            res = IoTHubDeviceClient_SendEventAsync(client_handle, message_handle, on_message_sent, nullptr);
+            IoTHubMessage_Destroy(message_handle); // message already copied into the SDK
+
+            if (res != IOTHUB_CLIENT_OK) {
+                LogError("Failed to send message event, error: %d", res);
+                goto cleanup;
+            }
+
+            ThisThread::sleep_for(Sendrate);
+        }
         
-        sprintf(message, "{ \"Pressure\" : %s, \"Temperature\" : %s }", outputData.pressure.c_str(), outputData.temperature.c_str());
-        LogInfo("Sending: \"%s\"", message);
-
-        message_handle = IoTHubMessage_CreateFromString(message);
-        if (message_handle == nullptr) {
-            LogError("Failed to create message");
-            goto cleanup;
-        }
-
-        res = IoTHubDeviceClient_SendEventAsync(client_handle, message_handle, on_message_sent, nullptr);
-        IoTHubMessage_Destroy(message_handle); // message already copied into the SDK
-
-        if (res != IOTHUB_CLIENT_OK) {
-            LogError("Failed to send message event, error: %d", res);
-            goto cleanup;
-        }
-
-        ThisThread::sleep_for(Sendrate);
+        
     }
 
     // If the user didn't manage to send a cloud-to-device message earlier,

@@ -16,7 +16,8 @@ namespace azure_cloud {
         // This one will not work, but I guess you knew that ;)
         //const char iothub_connection_string[] = "HostName=iotc-11343a6f-e1d2-4897-ae7a-0c58592da3e6.azure-devices.net;DeviceId=o8y9e034y0;SharedAccessKey=584JUhKT/JV9CpS0sCIJHbKztD2LnyZDqjR2VrPa3wQ=";
         //Jakes Connection String 
-        const char iothub_connection_string[] = "HostName=iotc-11343a6f-e1d2-4897-ae7a-0c58592da3e6.azure-devices.net;DeviceId=o8y9e034y0;SharedAccessKey=584JUhKT/JV9CpS0sCIJHbKztD2LnyZDqjR2VrPa3wQ=";
+        const char iothub_connection_string[] = "HostName=iotc-11343a6f-e1d2-4897-ae7a-0c58592da3e6.azure-devices.net;DeviceId=24kt7bcqr3c;SharedAccessKey=CjE31OCFCF+NstdtVcigYt/qmul0mqIovu/R0c3Va1U=";
+
     }
 }
 #endif
