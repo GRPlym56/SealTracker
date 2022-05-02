@@ -14,6 +14,9 @@
 
 extern EventQueue PrintQueue;
 typedef enum {NOW = 0, PREVIOUS = 1}delta;
+
+template <typename T>
+auto seconds_to_duration(T seconds); 
 //extern MS5837 PressSens;
 
 class SealSubmersion
@@ -22,7 +25,8 @@ class SealSubmersion
 
     SealSubmersion(CircBuff* SDBuff, CommsWrapper* Communications, MS5837* PressSens);
     void SurfaceDetection();
-    void GetDepth();
+    void UpdateDepth();
+    
 
     private:
 
@@ -33,7 +37,7 @@ class SealSubmersion
     volatile float depth[2]; //track previous and current depth
     volatile float delta_depth; //track difference in depth
 
-    chrono::seconds delay = 5s; //default delay 5s
+    unsigned int delay = 5; //default delay 5s
 
 
 

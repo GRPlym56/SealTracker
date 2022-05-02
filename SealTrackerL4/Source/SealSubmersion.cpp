@@ -22,7 +22,7 @@ void SealSubmersion::SurfaceDetection()
 
     //first algorithm attempt with perturb and observe style behaviour
 
-    GetDepth(); //measure depth in metres and produce a delta
+    UpdateDepth(); //measure depth in metres and produce a delta
 
     if(depth[NOW] < 0.3f)
     {
@@ -43,7 +43,7 @@ void SealSubmersion::SurfaceDetection()
             NRF->Off();
         }
 
-        delay = 2s; //set to minimum
+        delay = 2; //set to minimum
 
     }else
     {
@@ -55,32 +55,33 @@ void SealSubmersion::SurfaceDetection()
         }else if((int)delta_depth > 0)
         {
             //seal has gone deeper, increase delay
-            if(delay >= 60s)
+            if(delay >= 60)
             {
                 //do nothing, delay is short enough
             }else
             {
-                delay += 2s;
+                delay += 2;
             }
         }else
         {
             //seal is rising, reduce delay
-            if(delay <= 2s)
+            if(delay <= 2)
             {
                 //do nothing, delay is short enough
             }else
             {
-                delay -= 2s;
+                delay -= 4;
             }
         }
     }
     
-    ThisThread::sleep_for(delay);
+    
+    ThisThread::sleep_for(seconds_to_duration(delay));
 
 }
 
 
-void SealSubmersion::GetDepth() //measures current pressure value and updates depth
+void SealSubmersion::UpdateDepth() //measures current pressure value and updates depth
 {
     depth[PREVIOUS] = depth[NOW]; //update prior value
 
@@ -94,6 +95,14 @@ void SealSubmersion::GetDepth() //measures current pressure value and updates de
     delta_depth = depth[NOW] - depth[PREVIOUS];
 
 
+
 }
+
+template <typename T>
+auto seconds_to_duration(T seconds) 
+{
+    return std::chrono::duration<T, std::ratio<1>>(seconds);
+}
+
 
 

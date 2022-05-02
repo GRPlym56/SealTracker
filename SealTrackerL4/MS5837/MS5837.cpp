@@ -85,7 +85,7 @@ float MS5837::MS5837_Temperature(void)
         SensorLock.unlock();
     }else 
     {
-        PrintQueue.call(printf, "Fault: failed to acquire Sensor lock in get pressure");
+        PrintQueue.call(printf, "Fault: failed to acquire Sensor lock in get temperature");
         return 0.0f;
     }
 }
