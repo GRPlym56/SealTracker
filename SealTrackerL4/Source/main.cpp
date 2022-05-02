@@ -13,7 +13,9 @@
 #include "CommsWrapper.hpp"
 #include "SealSubmersion.hpp"
 
-
+ /*
+    MAKE SURE BUILD PROFILE IN MBED STUDIO IS SET TO DEVELOP    
+ */
 
 
 EventQueue PrintQueue;
@@ -50,10 +52,6 @@ int main() {
     SDThread.start(SDFlush);
     SDThread.set_priority(osPriorityLow); //low priority 
 
-    /*
-        MAKE SURE BUILD PROFILE IN MBED STUDIO IS SET TO DEVELOP
-        this reduces average current by approx 6mA
-    */
     
     if(sleep_manager_can_deep_sleep()) //check deep sleep
     {

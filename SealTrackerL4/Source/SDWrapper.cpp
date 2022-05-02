@@ -104,11 +104,6 @@ int SDCARD::flush() //flush all samples from buffer to
             for(int i = 0; i<size; i++) //loop for as many samples as we have
             { 
                 output = SDBuffer->Get();
-                //PrintQueue.call(printf, "Write to SD: %s, %s\n\r", output.pressure.c_str(), output.temperature.c_str()); //write each n byte line
-                /*
-                fprintf(fp, "%s\n", output.pressure.c_str()); //write each n byte line
-                fprintf(ft, "%s\n", output.temperature.c_str());
-                */
                 
                 fprintf(samplefile, "%s,%s,%s\n", output.pressure.c_str(), output.temperature.c_str(), output.time.c_str());
                 
