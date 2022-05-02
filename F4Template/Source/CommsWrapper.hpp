@@ -22,6 +22,8 @@ class CommsWrapper
     void InitReceiveNode();
     void Decode();
 
+    void SetAzureThreadID(osThreadId_t threadID);
+
     private:
 
     nRF24L01P Comms;   
@@ -35,6 +37,7 @@ class CommsWrapper
     CircBuff* sdbuff;
     CircBuff* netbuff;
     
+    osThreadId_t AzureThread;
     
     
     

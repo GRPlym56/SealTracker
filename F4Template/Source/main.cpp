@@ -8,6 +8,8 @@
 #include <ratio>
 
 
+
+
 EventQueue PrintQueue;
 CircBuff SDBuffer(256, "SDBuff");
 CircBuff NetBuffer(256, "NetBuff");
@@ -33,7 +35,9 @@ int main() {
     RFThread.start(ReceiveData);
     AzureThread.start(Networking);
 
-    microSD.Test();
+    RFModule.SetAzureThreadID(AzureThread.get_id()); //give azure thread ID to the commswrapper
+
+    microSD.Test(); //write a simple text file 
     
 
     while (1)

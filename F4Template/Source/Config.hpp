@@ -9,8 +9,7 @@ December-January 2022
 #include <iostream>
 #include <string>
 
-//#include "uop_msb.h"
-
+#define AzureFlag (1UL << 9) //flag for azure to wait on
 
 typedef struct  //template struct for SPI devices
 {
@@ -23,22 +22,6 @@ typedef struct  //template struct for SPI devices
 } SPIConfig_t ;
 
 
-const SPIConfig_t BMP280_Pins{
-    PB_5,
-    PB_4,
-    PB_3,
-    PB_2 
-};
-
-const SPIConfig_t MatrixPins
-{
-    PC_12, //MOSI
-    PC_11, //dummy MISO (not needed, dunno bro (IOE))
-    PC_10, //SCLK
-    PB_6,  //CS
-    PB_12, //OE
-};
-
 const SPIConfig_t SDpins{
     PB_5,
     PB_4,
@@ -46,36 +29,12 @@ const SPIConfig_t SDpins{
     PF_3
 };
 
-enum THRESHOLDS{LOWER = 0, UPPER};
-
-typedef struct {
-            unsigned short light[2];
-            unsigned short temp[2];
-            unsigned short press[2];
-}Thresholds_t;
-
-
-const Thresholds_t initLimits{
-    {20,60},        //Light
-    {15,30},        //Temp
-    {950, 1150}     //Press
-};
-
-
-typedef struct{
-            bool valid;
-            unsigned short sampleNo;
-            unsigned short temp;
-            unsigned short press;
-            unsigned short light;
-            char date[11];
-            char time[9];
-}sample_t;
 
 typedef struct 
 {
     std::string pressure;
     std::string temperature;
+    std::string time;
 
 } sealsample_t;
 
@@ -101,9 +60,5 @@ const NRFPINS RFPINS
 
 };
 
-const PinName BLUEBUTTON = PC_13;
-const PinName WARNINGLIGHT = PC_3;
-
-// typedef struct {char message[128];} errorLog_t;
 
 #endif

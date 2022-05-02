@@ -1,3 +1,7 @@
+/*
+    written by Guy Ringshaw 2022
+*/
+
 #ifndef __SEALSUBMERSION_HPP__
 #define __SEALSUBMERSION_HPP__
 
@@ -9,7 +13,7 @@
 
 
 extern EventQueue PrintQueue;
-typedef enum{NOW = 0, PREVIOUS = 1};
+typedef enum {NOW = 0, PREVIOUS = 1}delta;
 //extern MS5837 PressSens;
 
 class SealSubmersion
@@ -22,7 +26,7 @@ class SealSubmersion
 
     private:
 
-    CircBuff* SDBuffer;
+    CircBuff* Buffer;
     CommsWrapper* NRF;
     MS5837* Sensor;
 

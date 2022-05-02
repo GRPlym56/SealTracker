@@ -20,10 +20,8 @@ class CircBuff
         sealsample_t Get(void);
         sealsample_t Peek(void);
         unsigned int GetSize(void);
-        
 
-    
-
+        bool IsEmpty(void);
 
     private:
 

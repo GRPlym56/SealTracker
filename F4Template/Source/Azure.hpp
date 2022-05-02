@@ -23,9 +23,9 @@
 
 
 
+
 extern NetworkInterface *_defaultSystemNetwork;
 extern EventQueue PrintQueue;
-
 
 
 

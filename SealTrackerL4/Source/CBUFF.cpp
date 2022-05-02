@@ -121,7 +121,7 @@ bool CircBuff::FullCheck(void) //private function, no mutex
     
 }
 
-bool CircBuff::EmptyCheck(void) //private function, no mutex
+bool CircBuff::EmptyCheck(void) //private function, no mutex 
 {
    
     if(currentsize == 0)
@@ -135,6 +135,26 @@ bool CircBuff::EmptyCheck(void) //private function, no mutex
     }
 
         
+}
+
+bool CircBuff::IsEmpty(void) //public version with mutex
+{
+    if(Bufferlock.trylock_for(5s))
+    {
+        if(currentsize == 0)
+        {
+            PrintQueue.call(printf, "%s buffer empty\n\r", name);
+            return 1; //buffer empty
+            
+        }else 
+        {
+            return 0; //buffer not empty
+        }
+    }else 
+    {
+        PrintQueue.call(printf, "%s Fault: 'IsEmpty' trylock failed\n\r", name);
+        return 1; //effectively empty if fault occurs
+    }
 }
 
 void CircBuff::IncrementHead(void) //private function, no mutex

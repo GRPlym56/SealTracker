@@ -53,8 +53,7 @@ void CommsWrapper::Sendmsg(char msg[]) //function for sending one message
     }
 }
 
-//function for sending data when lots of data needs to be sent quickly, it is on the user to manage power
-//once it is done
+//function for sending data when lots of data needs to be sent quickly, it is on the user to manage power once it is done
 void CommsWrapper::DataDump(char msg[]) 
 {
     //unsigned int length = strlen(msg);
@@ -66,7 +65,18 @@ void CommsWrapper::DataDump(char msg[])
     }
     else
     {
-        PrintQueue.call(printf, "Message too long \n\r");
+        PrintQueue.call(printf, "Error: Message too long \n\r");
     }
+}
+
+void CommsWrapper::On()
+{
+    Comms.powerUp();
+}
+
+void CommsWrapper::Off()
+{
+    Comms.powerDown();
+    Comms.disable();
 }
 

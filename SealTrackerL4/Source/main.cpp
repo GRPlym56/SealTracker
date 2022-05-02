@@ -1,7 +1,6 @@
-/* mbed Microcontroller Library
- * Copyright (c) 2019 ARM Limited
- * SPDX-License-Identifier: Apache-2.0
- */
+/*
+    Written by Guy Ringshaw 2022
+*/
 
 #include "mbed.h"
 #include "platform/mbed_thread.h"
@@ -14,7 +13,7 @@
 #include "CommsWrapper.hpp"
 #include "SealSubmersion.hpp"
 
-#define TRANSFER_SIZE   32
+
 
 
 EventQueue PrintQueue;
@@ -27,18 +26,23 @@ CircBuff SDBuffer(512, "SDBuff"); //main buffer for getting samples to the SD ca
 SDCARD microSD(SDpins, &SDBuffer);
 
 CircBuff DiveBuff(128, "DiveBuff"); //secondary buffer for live readout of data characterising dive behaviour on azure
+SealSubmersion DiveTracker(&DiveBuff, &NRF, &PressSens); 
 
 
 
 
 Thread SealSumbersion, PrintThread, SDThread;
 
+void UpdateSamplers();
 void Printer();
 void SDFlush();
+
+
 
 int main() {
 
     set_time(1651322988); //unix epoch time
+    
 
     PrintThread.start(Printer); //must start before everything else
     microSD.Test();
@@ -60,30 +64,39 @@ int main() {
     while(1) 
     {
         
-
-        ThisThread::sleep_for(100s);
+        DiveTracker.SurfaceDetection(); 
+        
         
     }
 
 }
 
 
-void PrimarySampler()
+void UpdateSamplers()
 {
     sealsample_t sample;
     char timesample[32];
+    unsigned short count = 0;
     while(1)
     {
+        //time is necessary as these will be viewed from the SD card later
         time_t seconds = time(NULL);
         PressSens.Barometer_MS5837();
         sample.pressure = PressSens.MS5837_Pressure();
         sample.temperature = PressSens.MS5837_Temperature();
-        sample.time = strftime(timesample, 32, "%b,%d,%H:%M\n", localtime(&seconds));
+        sample.time = strftime(timesample, 32, "%b,%d,%H:%M", localtime(&seconds));
         SDBuffer.Put(sample); //put new sample on buffer
+        
+        count++;
+        if(count == 5) 
+        {
+            DiveBuff.Put(sample); //update dive characteristic buffer every 5 mins
+        }
         ThisThread::sleep_for(60s);
-
     }
 }
+
+
 
 void Printer()
 {

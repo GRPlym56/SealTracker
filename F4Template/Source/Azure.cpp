@@ -136,15 +136,20 @@ void Azure::SendData() {
     */
 
     while(1){
+
         if (message_received) {
             // If we have received a message from the cloud, don't send more messeges
             break;
         }
+        ThisThread::sleep_for(250ms); //does not need to rapidly poll, NRF data in is higher priority
+        ThisThread::flags_wait_all(AzureFlag, false); //wait on a flag, dont clear until we are certain the buffer is empty
+
         if(NetBuffer->EmptyCheck())
         {
-            //check if we actually have any data to send to Azure first
+
             PrintQueue.call(printf, "Netbuff empty, nothing to send\n");
-            ThisThread::sleep_for(4s); //check again after a few seconds
+            ThisThread::flags_clear(AzureFlag); //clear flag
+            
         }else 
         {
                 //Send data in this format:
@@ -152,12 +157,13 @@ void Azure::SendData() {
                 {
                     "Pressure" : 1000.5,
                     "Temperature" : 21.3
+                    "Time" :  oct,17,21:09
                 }
 
             */
             sealsample_t outputData = NetBuffer->Get(); //get samples from buffer 
             
-            sprintf(message, "{ \"Pressure\" : %s, \"Temperature\" : %s }", outputData.pressure.c_str(), outputData.temperature.c_str());
+            sprintf(message, "{ \"Pressure\" : %s, \"Temperature\" : %s, \"Time\" : %s }", outputData.pressure.c_str(), outputData.temperature.c_str(), outputData.time.c_str());
             LogInfo("Sending: \"%s\"", message);
 
             message_handle = IoTHubMessage_CreateFromString(message);
@@ -174,7 +180,7 @@ void Azure::SendData() {
                 goto cleanup;
             }
 
-            ThisThread::sleep_for(Sendrate);
+            
         }
         
         

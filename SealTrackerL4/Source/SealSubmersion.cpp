@@ -1,11 +1,15 @@
+/*
+    written by Guy Ringshaw 2022
+*/
+
 #include "SealSubmersion.hpp"
 #include <chrono>
 
 
-SealSubmersion::SealSubmersion(CircBuff* SDBuff, CommsWrapper* Communications, MS5837* PressSens): SDBuffer(SDBuff), NRF(Communications), Sensor(PressSens)
+SealSubmersion::SealSubmersion(CircBuff* Buff, CommsWrapper* Communications, MS5837* PressSens): Buffer(Buff), NRF(Communications), Sensor(PressSens)
 {
 
-    
+
 
 }
 
@@ -19,36 +23,55 @@ void SealSubmersion::SurfaceDetection()
     //first algorithm attempt with perturb and observe style behaviour
 
     GetDepth(); //measure depth in metres and produce a delta
+
     if(depth[NOW] < 0.3f)
     {
-        
         //seal is within margin of error, attempt to send data
-        //NRF->DataDump();
-    }
+        if(Buffer->IsEmpty())
+        {
+            //buffer empty, do nothing
+        }else {
 
-    //typecast delta depth to remove centimetre deviation, not important for 10 or 100m scale dive
-    if((int)delta_depth == 0)
-    {
-        //seal is cruising, do not modify delay
-    }else if((int)delta_depth > 0)
-    {
-        //seal has gone deeper, increase delay
-        if(delay >= 60s)
-        {
-            //do nothing, delay is short enough
-        }else
-        {
-            delay += 2s;
+            NRF->On();
+
+            while(!(Buffer->IsEmpty())){
+                char message[32];
+                sealsample_t sample = Buffer->Get();
+                sprintf(message, "%s,%s,%s", sample.pressure.c_str(), sample.temperature.c_str(), sample.time.c_str());
+                NRF->DataDump(message); //send sample
+            }
+            NRF->Off();
         }
+
+        delay = 2s; //set to minimum
+
     }else
     {
-        //seal is rising, reduce delay
-        if(delay <= 2s)
+
+        //typecast delta depth to remove centimetre deviation, not important for 10 or 100m scale dive
+        if((int)delta_depth == 0)
         {
-            //do nothing, delay is short enough
+            //seal is cruising, do not modify delay
+        }else if((int)delta_depth > 0)
+        {
+            //seal has gone deeper, increase delay
+            if(delay >= 60s)
+            {
+                //do nothing, delay is short enough
+            }else
+            {
+                delay += 2s;
+            }
         }else
         {
-            delay -= 2s;
+            //seal is rising, reduce delay
+            if(delay <= 2s)
+            {
+                //do nothing, delay is short enough
+            }else
+            {
+                delay -= 2s;
+            }
         }
     }
     

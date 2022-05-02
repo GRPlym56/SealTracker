@@ -1,3 +1,7 @@
+/*
+    written by Guy Ringshaw 2022
+*/
+
 #ifndef __SDWRAPPER_HPP__
 #define __SDWRAPPER_HPP__
 
@@ -20,7 +24,6 @@
 #endif
 
 extern EventQueue PrintQueue;
-
 
 
 class SDCARD 

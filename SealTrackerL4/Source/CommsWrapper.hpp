@@ -23,6 +23,9 @@ class CommsWrapper
     void InitReceiveNode();
     void Sendmsg(char msg[]);
     void DataDump(char msg[]);
+
+    void On();
+    void Off();
   
 
     private:

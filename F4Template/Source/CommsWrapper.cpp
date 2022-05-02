@@ -88,4 +88,11 @@ void CommsWrapper::Decode()
     sdbuff->Put(rxDataFormatted); 
     netbuff->Put(rxDataFormatted);
 
+    osSignalSet(AzureThread, AzureFlag); //there is now data to 
+
+}
+
+void CommsWrapper::SetAzureThreadID(osThreadId_t threadID)
+{
+    AzureThread = threadID;
 }
