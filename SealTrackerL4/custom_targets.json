@@ -1,0 +1,7 @@
+{
+    "CUSTOM_L432KC": {
+            "inherits": ["NUCLEO_L432KC"],
+            "components": ["SD"],
+            "features_add": ["STORAGE"]
+        }
+}

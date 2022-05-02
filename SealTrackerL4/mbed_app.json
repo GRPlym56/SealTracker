@@ -1,9 +1,14 @@
 {
 "target_overrides": {
-        "*": {
-            "target.printf_lib": ["std"],
+        "NUCLEO_L432KC": {
             "target.macros_add": ["MBED_TICKLESS"],
-            "target.macros_add": ["MBED_CPU_STATS_ENABLED"]
+            "target.macros_add": ["MBED_CPU_STATS_ENABLED"],
+            "sd.SPI_MOSI": "PA_12",
+            "sd.SPI_MISO": "PA_6",
+            "sd.SPI_CLK":  "PA_5",
+            "sd.SPI_CS":   "PB_0",
+            "target.components_add": ["SD"],
+            "target.c_lib": "std"
         }
     }
 }
