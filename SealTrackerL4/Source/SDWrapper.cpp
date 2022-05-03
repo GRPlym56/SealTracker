@@ -24,7 +24,7 @@ SDCARD::SDCARD(SPIConfig_t pins, CircBuff* SDBuff): SD(pins.MOSI, SDpins.MISO, S
     samplefile = fopen(fileName, "w");
 
     if(samplefile == NULL) {
-        error("Could not open file for write\n");
+        error("Could not open test file for write\n");
         SD.deinit();
         
     }else
@@ -53,7 +53,7 @@ void SDCARD::Test(void)
     //FATFileSystem fs("sd", &SD);
     ftest = fopen("/sd/test.txt","w");
     if(ftest == NULL) {
-        PrintQueue.call(printf, ("Could not open file for write\n"));
+        PrintQueue.call(printf, ("Could not open text file for write\n"));
         SD.deinit();
         //return -1;
     } else {
@@ -85,7 +85,7 @@ int SDCARD::flush() //flush all samples from buffer to
         
         PrintQueue.call(printf, "%s\n", fileName);
         //PrintQueue.call(printf, "%s\n", fileName1);
-        sealsample_t output;
+        sealsampleL4_t output;
 
         /*
         fp = fopen(fileName,"w");
@@ -105,7 +105,7 @@ int SDCARD::flush() //flush all samples from buffer to
             { 
                 output = SDBuffer->Get();
                 
-                fprintf(samplefile, "%s,%s,%s\n", output.pressure.c_str(), output.temperature.c_str(), output.time.c_str());
+                fprintf(samplefile, "%f,%f,%s\n", output.pressure, output.temperature, output.time.c_str());
                 
             }
             //SDLock.unlock();

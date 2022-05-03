@@ -66,10 +66,10 @@ int32_t MS5837::MS5837ReadADC(void)
 /* return the results */
 float MS5837::MS5837_Pressure(void)
 {
-    if(SensorLock.trylock_for(5s))
+    if(SensorLock.trylock_for(10s))
     {
-        return P_MS5837;
         SensorLock.unlock();
+        return P_MS5837;
     }else 
     {
         PrintQueue.call(printf, "Fault: failed to acquire Sensor lock in get pressure");
@@ -79,10 +79,10 @@ float MS5837::MS5837_Pressure(void)
 }
 float MS5837::MS5837_Temperature(void)
 {
-     if(SensorLock.trylock_for(5s))
+     if(SensorLock.trylock_for(10s))
     {
-        return T_MS5837;
         SensorLock.unlock();
+        return T_MS5837;
     }else 
     {
         PrintQueue.call(printf, "Fault: failed to acquire Sensor lock in get temperature");
@@ -93,7 +93,7 @@ float MS5837::MS5837_Temperature(void)
 /* Sensor reading and calculation procedure */
 void MS5837::Barometer_MS5837(void)
 {
-    if(SensorLock.trylock_for(5s)) //added by Guy Ringshaw
+    if(SensorLock.trylock_for(10s)) //added by Guy Ringshaw
     {
         int32_t dT, temp;
         int64_t OFF, SENS, press;
@@ -116,11 +116,12 @@ void MS5837::Barometer_MS5837(void)
         press    = (((int64_t)D1 * SENS) / (1<<21) - OFF) / (1<<13);
         P_MS5837 = (float) press / 10.0f;                 // result of pressure in mBar in this var
         
-        
+        /*
         if (P_MS5837 < 900 || P_MS5837 > 3000) {
             MS5837Reset();                 // reset the sensor
             MS5837ReadProm();             // read the calibration values
         }
+        */
         SensorLock.unlock();
     }else {
         PrintQueue.call(printf, "Fault: failed to acquire Sensor lock in barometer \r\n");

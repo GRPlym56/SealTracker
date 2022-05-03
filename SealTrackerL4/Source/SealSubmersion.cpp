@@ -36,8 +36,8 @@ void SealSubmersion::SurfaceDetection()
 
             while(!(Buffer->IsEmpty())){
                 char message[32];
-                sealsample_t sample = Buffer->Get();
-                sprintf(message, "%s,%s,%s", sample.pressure.c_str(), sample.temperature.c_str(), sample.time.c_str());
+                sealsampleL4_t sample = Buffer->Get();
+                sprintf(message, "%f,%f,%s", sample.pressure, sample.temperature, sample.time.c_str());
                 NRF->DataDump(message); //send sample
             }
             NRF->Off();
@@ -98,11 +98,7 @@ void SealSubmersion::UpdateDepth() //measures current pressure value and updates
 
 }
 
-template <typename T>
-auto seconds_to_duration(T seconds) 
-{
-    return std::chrono::duration<T, std::ratio<1>>(seconds);
-}
+
 
 
 

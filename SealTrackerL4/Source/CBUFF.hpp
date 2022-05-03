@@ -16,9 +16,9 @@ class CircBuff
         CircBuff(unsigned int buffsize, char * buffername);
    
         //public functions protected by Bufferlock
-        void Put(sealsample_t newsample);
-        sealsample_t Get(void);
-        sealsample_t Peek(void);
+        void Put(sealsampleL4_t newsample);
+        sealsampleL4_t Get(void);
+        sealsampleL4_t Peek(void);
         unsigned int GetSize(void);
 
         bool IsEmpty(void);
@@ -38,7 +38,7 @@ class CircBuff
 
         char * name;
         
-        sealsample_t * Buffer; //pointer to buffer location when created by constructor
+        sealsampleL4_t * Buffer; //pointer to buffer location when created by constructor
 
 
         void IncrementHead(void);

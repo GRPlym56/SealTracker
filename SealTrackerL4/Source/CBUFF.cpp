@@ -4,18 +4,18 @@
 CircBuff::CircBuff(unsigned int buffsize, char * buffername): max_size(buffsize), max_index(buffsize-1), name(buffername)
 {
 
-    Buffer = new sealsample_t [buffsize]; //allocate some memory for the new buffer
+    Buffer = new sealsampleL4_t [buffsize]; //allocate some memory for the new buffer
     PrintQueue.call(printf, "New buffer %s, Size: %d\n\r", name, buffsize);
 
 
 }
 
 
-void CircBuff::Put(sealsample_t newsample)
+void CircBuff::Put(sealsampleL4_t newsample)
 {
     
     //put a sample onto the buffer
-    if(Bufferlock.trylock_for(5s))
+    if(Bufferlock.trylock_for(10s))
     {
         if(FullCheck())
         {
@@ -44,10 +44,10 @@ void CircBuff::Put(sealsample_t newsample)
 
 }
 
-sealsample_t CircBuff::Get() //return a sample from the buffer and increment tail
+sealsampleL4_t CircBuff::Get() //return a sample from the buffer and increment tail
 {
     
-    sealsample_t returnsample;
+    sealsampleL4_t returnsample;
     if(Bufferlock.trylock_for(15s))
     {
         if(EmptyCheck()) //check if buffer is empty
@@ -74,10 +74,10 @@ sealsample_t CircBuff::Get() //return a sample from the buffer and increment tai
     return returnsample;
 }
 
-sealsample_t CircBuff::Peek()
+sealsampleL4_t CircBuff::Peek()
 {
     //return sample but dont increment tail
-    sealsample_t returnsample;
+    sealsampleL4_t returnsample;
     if(Bufferlock.trylock_for(5s))
     {
         if(EmptyCheck()) //check if buffer is empty

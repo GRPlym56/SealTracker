@@ -31,11 +31,11 @@ const SPIConfig_t SDpins{
 
 typedef struct 
 {
-    std::string pressure;
-    std::string temperature;
+    float pressure;
+    float temperature;
     std::string time;
 
-} sealsample_t;
+} sealsampleL4_t;
 
 typedef struct 
 {

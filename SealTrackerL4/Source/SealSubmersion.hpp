@@ -16,7 +16,10 @@ extern EventQueue PrintQueue;
 typedef enum {NOW = 0, PREVIOUS = 1}delta;
 
 template <typename T>
-auto seconds_to_duration(T seconds); 
+auto seconds_to_duration(T seconds) 
+{
+    return std::chrono::duration<T, std::ratio<1>>(seconds);
+}
 //extern MS5837 PressSens;
 
 class SealSubmersion
