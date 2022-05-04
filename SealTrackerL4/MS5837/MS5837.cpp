@@ -68,8 +68,9 @@ float MS5837::MS5837_Pressure(void)
 {
     if(SensorLock.trylock_for(10s))
     {
+        float Press = P_MS5837;
         SensorLock.unlock();
-        return P_MS5837;
+        return Press; //returning copy as this statement can now be interrupted 
     }else 
     {
         PrintQueue.call(printf, "Fault: failed to acquire Sensor lock in get pressure");
@@ -79,10 +80,11 @@ float MS5837::MS5837_Pressure(void)
 }
 float MS5837::MS5837_Temperature(void)
 {
-     if(SensorLock.trylock_for(10s))
+    if(SensorLock.trylock_for(10s))
     {
+        float Temp = T_MS5837;
         SensorLock.unlock();
-        return T_MS5837;
+        return Temp; //returning copy as this statement can now be interrupted 
     }else 
     {
         PrintQueue.call(printf, "Fault: failed to acquire Sensor lock in get temperature");
@@ -130,4 +132,18 @@ void MS5837::Barometer_MS5837(void)
 
 float MS5837::depth(void) {
     return (P_MS5837/100)*1.019716;
+}
+
+void MS5837::ScanI2C(void)
+{
+    int ack;
+    int address;
+    for(address=1;address<127;address++) {    
+    ack = i2c.write(address, "11", 1);
+    if (ack == 0) {
+       PrintQueue.call(printf,"\tFound at %3d -- %3x\r\n", address,address);
+    }    
+    PrintQueue.call(printf, "no device found \n\r");
+    ThisThread::sleep_for(50ms);
+  } 
 }

@@ -8,7 +8,8 @@
             "sd.SPI_CLK":  "PA_5",
             "sd.SPI_CS":   "PB_0",
             "target.components_add": ["SD"],
-            "target.c_lib": "std"
+            "target.c_lib": "std",
+            "target.printf_lib": "std"
         }
     }
 }

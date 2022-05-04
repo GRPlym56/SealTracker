@@ -9,7 +9,7 @@
 SealSubmersion::SealSubmersion(CircBuff* Buff, CommsWrapper* Communications, MS5837* PressSens): Buffer(Buff), NRF(Communications), Sensor(PressSens)
 {
 
-
+    GetAmbientDepth(); //grab initial pressure value
 
 }
 
@@ -30,11 +30,14 @@ void SealSubmersion::SurfaceDetection()
         if(Buffer->IsEmpty())
         {
             //buffer empty, do nothing
-        }else {
+            PrintQueue.call(printf, "No data to send\n\r");
+        }else{
 
+            PrintQueue.call(printf, "Data available, attempting to send\n\r");
             NRF->On();
-
-            while(!(Buffer->IsEmpty())){
+            unsigned int size = Buffer->GetSize();
+            for (int i = 0; i<size; i++)
+            {
                 char message[32];
                 sealsampleL4_t sample = Buffer->Get();
                 sprintf(message, "%f,%f,%s", sample.pressure, sample.temperature, sample.time.c_str());
@@ -57,7 +60,7 @@ void SealSubmersion::SurfaceDetection()
             //seal has gone deeper, increase delay
             if(delay >= 60)
             {
-                //do nothing, delay is short enough
+                //do nothing, delay is long enough
             }else
             {
                 delay += 2;
@@ -75,8 +78,8 @@ void SealSubmersion::SurfaceDetection()
         }
     }
     
-    
-    ThisThread::sleep_for(seconds_to_duration(delay));
+    PrintQueue.call(printf, "Delay: %d \n\r", delay);
+    ThisThread::sleep_for(delay*1000);
 
 }
 
@@ -87,15 +90,23 @@ void SealSubmersion::UpdateDepth() //measures current pressure value and updates
 
     Sensor->Barometer_MS5837(); //update values
     float Pressure = Sensor->MS5837_Pressure();
-
-    //TODO: replace 1013.25 with a value recorded on startup
-    depth[NOW] = (Pressure - 1013.25)/100.52; //remove 1013.25 ambient surface pressure, divide by 100.52 to get depth in metres
     
+    
+    depth[NOW] = (Pressure - pressure_offset)/100.52; //remove 1013.25 ambient surface pressure, divide by 100.52 to get depth in metres
+    PrintQueue.call(printf, "Depth: %f \n\r", depth[NOW]);
 
     delta_depth = depth[NOW] - depth[PREVIOUS];
 
 
 
+}
+
+void SealSubmersion::GetAmbientDepth() //convert ambient pressure value to depth to calibrate depth tracking
+{
+
+    Sensor->Barometer_MS5837();
+    pressure_offset = Sensor->MS5837_Pressure();
+    
 }
 
 

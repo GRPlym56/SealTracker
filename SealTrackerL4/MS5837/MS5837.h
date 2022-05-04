@@ -57,6 +57,7 @@ public:
     float MS5837_Temperature (void);
     void Barometer_MS5837(void);
     float depth(void);
+    void ScanI2C(void);
 
 private:
     I2C     i2c;

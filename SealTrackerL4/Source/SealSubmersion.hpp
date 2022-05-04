@@ -39,8 +39,11 @@ class SealSubmersion
 
     volatile float depth[2]; //track previous and current depth
     volatile float delta_depth; //track difference in depth
+    volatile float pressure_offset; //ambient pressure value in depth 
 
-    unsigned int delay = 5; //default delay 5s
+    unsigned int delay = 5; //default delay 5s]
+
+    void GetAmbientDepth();
 
 
 
