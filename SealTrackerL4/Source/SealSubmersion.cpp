@@ -8,8 +8,8 @@
 
 SealSubmersion::SealSubmersion(CircBuff* Buff, CommsWrapper* Communications, MS5837* PressSens): Buffer(Buff), NRF(Communications), Sensor(PressSens)
 {
-
-    GetAmbientDepth(); //grab initial pressure value
+    
+    
 
 }
 
@@ -40,7 +40,7 @@ void SealSubmersion::SurfaceDetection()
             {
                 char message[32];
                 sealsampleL4_t sample = Buffer->Get();
-                sprintf(message, "%f,%f,%s", sample.pressure, sample.temperature, sample.time.c_str());
+                sprintf(message, "%4.1f|%2.1f", sample.pressure, sample.temperature); //format message
                 NRF->DataDump(message); //send sample
             }
             NRF->Off();
@@ -106,6 +106,7 @@ void SealSubmersion::GetAmbientDepth() //convert ambient pressure value to depth
 
     Sensor->Barometer_MS5837();
     pressure_offset = Sensor->MS5837_Pressure();
+    PrintQueue.call(printf, "Ambient pressure: %4.2f \n\r", pressure_offset);
     
 }
 

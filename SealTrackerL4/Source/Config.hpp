@@ -49,7 +49,7 @@ typedef struct
 
 const NRFPINS RFPINS
 {
-    PB_5, PB_4, PB_3, PA_4, PB_1, PA_8
+    PB_5_ALT0, PB_4_ALT0, PB_3_ALT0, PA_4_ALT0, PB_1, PA_8, 
 
 };
 

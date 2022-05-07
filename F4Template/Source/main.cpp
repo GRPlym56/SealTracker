@@ -33,9 +33,9 @@ int main() {
     PrintThread.start(Printer);
     RFModule.InitReceiveNode();
     RFThread.start(ReceiveData);
-    AzureThread.start(Networking);
+    //AzureThread.start(Networking);
 
-    RFModule.SetAzureThreadID(AzureThread.get_id()); //give azure thread ID to the commswrapper
+    //RFModule.SetAzureThreadID(AzureThread.get_id()); //give azure thread ID to the commswrapper
 
     microSD.Test(); //write a simple text file 
     

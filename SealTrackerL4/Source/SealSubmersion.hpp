@@ -29,7 +29,8 @@ class SealSubmersion
     SealSubmersion(CircBuff* SDBuff, CommsWrapper* Communications, MS5837* PressSens);
     void SurfaceDetection();
     void UpdateDepth();
-    
+    void GetAmbientDepth();
+
 
     private:
 
@@ -43,7 +44,7 @@ class SealSubmersion
 
     unsigned int delay = 5; //default delay 5s]
 
-    void GetAmbientDepth();
+   
 
 
 

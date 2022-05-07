@@ -23,12 +23,12 @@
 
 EventQueue PrintQueue;
 
-
+CommsWrapper NRF(RFPINS);
 CircBuff SDBuffer(256, "SDBuff"); //main buffer for getting samples to the SD card
 SDCARD microSD(SDpins, &SDBuffer);
 
 MS5837 PressSens(PA_10, PA_9); //SDA, SCL
-CommsWrapper NRF(RFPINS);
+
 
 CircBuff DiveBuff(128, "DiveBuff"); //secondary buffer for live readout of data characterising dive behaviour on azure
 SealSubmersion DiveTracker(&DiveBuff, &NRF, &PressSens); 
@@ -44,16 +44,24 @@ void SDFlush();
 
 int main() {
 
-    //set_time(1651322988); //unix epoch time
-    PressSens.ScanI2C();
-    PressSens.MS5837Init();
-    PressSens.Barometer_MS5837();
-    float press = PressSens.MS5837_Pressure();
-    float temp = PressSens.MS5837_Temperature();
-    PrintQueue.call(printf, "Press: %4.1f, Temp: %2.1f \n\r", press, temp);
-
-    PrintThread.start(Printer); //must start before everything else
+    PrintThread.start(Printer); //should start before every other thread
     microSD.Test();
+    //set_time(1651322988); //unix epoch time
+    NRF.InitSendNode();
+    PressSens.MS5837Init();
+    DiveTracker.GetAmbientDepth();
+    
+
+    
+    //NRF.Off();
+    while(1)
+    {
+        NRF.Sendmsg("1000.2|21.3");
+        ThisThread::sleep_for(1s);
+    }
+
+
+    //microSD.Test();
 
     SDThread.start(SDFlush);
     SDThread.set_priority(osPriorityLow); //low priority 
@@ -83,27 +91,29 @@ int main() {
 
 void UpdateSamplers()
 {
-    unsigned short count = 0;
+    volatile unsigned short count = 0;
     while(1)
     {  
         sealsampleL4_t sample;
         PressSens.Barometer_MS5837();
         //char timesample[32];
-        
+        ThisThread::sleep_for(5ms); //give time for the conversion to finish
         sample.pressure = PressSens.MS5837_Pressure();
         sample.temperature = PressSens.MS5837_Temperature();
 
-        PrintQueue.call(printf, "P:%f, T:%s\n\r", sample.pressure, sample.temperature);
+        PrintQueue.call(printf, "P:%f, T:%f\n\r", sample.pressure, sample.temperature);
         //sample.time = strftime(timesample, 32, "%b,%d,%H:%M", localtime(&seconds));
         SDBuffer.Put(sample); //put new sample on buffer
 
         count++;
+        PrintQueue.call(printf, "--Count: %d--\r\n", count);
         if(count == 5) 
         {
             DiveBuff.Put(sample); //update dive characteristic buffer every 5 mins
             count = 0;
+    
         }
-        ThisThread::sleep_for(10s);
+        ThisThread::sleep_for(5s);
     }
 }
 

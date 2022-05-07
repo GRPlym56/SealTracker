@@ -18,7 +18,13 @@ void CommsWrapper::InitSendNode()
 
 void CommsWrapper::InitReceiveNode()
 {
-    Comms.setAirDataRate(NRF24L01P_DATARATE_250_KBPS);
+    PrintQueue.call(printf, "nRF24L01+ Frequency    : %d MHz\r\n",  Comms.getRfFrequency() );
+    PrintQueue.call(printf, "nRF24L01+ Output power : %d dBm\r\n",  Comms.getRfOutputPower() );
+    PrintQueue.call(printf, "nRF24L01+ Data Rate    : %d kbps\r\n", Comms.getAirDataRate() );
+    PrintQueue.call(printf, "nRF24L01+ TX Address   : 0x%010llX\r\n", Comms.getTxAddress() );
+    PrintQueue.call(printf, "nRF24L01+ RX Address   : 0x%010llX\r\n", Comms.getRxAddress() );
+
+    Comms.setAirDataRate(NRF24L01P_DATARATE_1_MBPS);
     Comms.setTransferSize(32); //maximum message size 
     Comms.setReceiveMode(); 
     Comms.enable(); //go!
@@ -88,7 +94,7 @@ void CommsWrapper::Decode()
     sdbuff->Put(rxDataFormatted); 
     netbuff->Put(rxDataFormatted);
 
-    osSignalSet(AzureThread, AzureFlag); //there is now data to 
+    //osSignalSet(AzureThread, AzureFlag); //there is now data to 
 
 }
 

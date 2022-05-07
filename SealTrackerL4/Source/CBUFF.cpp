@@ -136,14 +136,16 @@ bool CircBuff::IsEmpty(void) //public version with mutex since it can happen any
     {
         if(currentsize == 0)
         {
+            Bufferlock.unlock();
             PrintQueue.call(printf, "%s buffer empty\n\r", name);
             return 1; //buffer empty
             
         }else 
         {
+            Bufferlock.unlock();
             return 0; //buffer not empty
         }
-        Bufferlock.unlock();
+        
     }else 
     {
         PrintQueue.call(printf, "%s Fault: 'IsEmpty' trylock failed\n\r", name);
@@ -179,8 +181,8 @@ unsigned int CircBuff::GetSize(void) //
 {
     if(Bufferlock.trylock_for(5s))
     {
-        return currentsize;
         Bufferlock.unlock();
+        return currentsize;
     }else 
     {
         PrintQueue.call(printf, "%s Fault: 'GetSzie' trylock failed\n\r", name);

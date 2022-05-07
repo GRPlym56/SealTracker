@@ -1,6 +1,6 @@
 #include "SDWrapper.hpp"
 
-SDCARD::SDCARD(SPIConfig_t pins, CircBuff* SDBuff): SD(pins.MOSI, SDpins.MISO, SDpins.SCLK, SDpins.CS), fs("sd", &SD), SDBuffer(SDBuff)
+SDCARD::SDCARD(SPIConfig_t pins, CircBuff* SDBuff): SD(SDpins.MOSI, SDpins.MISO, SDpins.SCLK, SDpins.CS), fs("sd", &SD), SDBuffer(SDBuff)
 {
 
     //FATFileSystem fs("sd", &SD);
@@ -21,6 +21,7 @@ SDCARD::SDCARD(SPIConfig_t pins, CircBuff* SDBuff): SD(pins.MOSI, SDpins.MISO, S
     fp = fopen(fileName,"w");
     ft = fopen(fileName1, "w");
     */
+    
     samplefile = fopen(fileName, "w");
 
     if(samplefile == NULL) {
@@ -31,7 +32,7 @@ SDCARD::SDCARD(SPIConfig_t pins, CircBuff* SDBuff): SD(pins.MOSI, SDpins.MISO, S
     {
     
         //PrintQueue.call(printf, "Write to SD: %s, %s\n\r", output.pressure.c_str(), output.temperature.c_str()); //write each n byte line
-        fprintf(samplefile, "Pressure mBar,Temperature C\n"); 
+        fprintf(samplefile, "Ligma ,Balls\n"); 
         
         //SDLock.unlock();
         //Tidy up here
@@ -58,7 +59,7 @@ void SDCARD::Test(void)
         //return -1;
     } else {
         //Put some text in the file...
-        fprintf(ftest, "Test Seals\n");
+        fprintf(ftest, "Ligma Balls\n");
         //Tidy up here
         fclose(ftest);
         PrintQueue.call(printf, ("SD Write done...\n"));

@@ -11,12 +11,12 @@
 
 Azure::Azure(CircBuff* NetBuff): NetBuffer(NetBuff) 
 {
-    
+   /* 
     Connect();
     
     setTime();
     Sendrate = 10s;
-    
+    */
 
 }
 
