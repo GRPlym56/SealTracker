@@ -5,7 +5,7 @@
 #include "mbed.h"
 #include "platform/mbed_thread.h"
 #include "nRF24L01P.h"
-#include "MS5837.h"
+#include "../MS5837/MS5837.h"
 #include "string.h"
 #include "SDWrapper.hpp"
 #include "CBUFF.hpp"
@@ -44,22 +44,16 @@ void SDFlush();
 
 int main() {
 
+    set_time(1652184653); //12:10 may 10th 2022
+
     PrintThread.start(Printer); //should start before every other thread
     microSD.Test();
-    //set_time(1651322988); //unix epoch time
     NRF.InitSendNode();
     PressSens.MS5837Init();
     DiveTracker.GetAmbientDepth();
     
 
-    
-    //NRF.Off();
-    while(1)
-    {
-        NRF.Sendmsg("1000.2|21.3");
-        ThisThread::sleep_for(1s);
-    }
-
+  
 
     //microSD.Test();
 
@@ -95,14 +89,18 @@ void UpdateSamplers()
     while(1)
     {  
         sealsampleL4_t sample;
-        PressSens.Barometer_MS5837();
-        //char timesample[32];
+        char timesample[32];
+        time_t seconds = time(NULL); //get current time from the rtc
+        PressSens.Barometer_MS5837(); //get latest temperature and pressure values
+        
         ThisThread::sleep_for(5ms); //give time for the conversion to finish
-        sample.pressure = PressSens.MS5837_Pressure();
+        sample.pressure = PressSens.MS5837_Pressure(); 
         sample.temperature = PressSens.MS5837_Temperature();
 
         PrintQueue.call(printf, "P:%f, T:%f\n\r", sample.pressure, sample.temperature);
-        //sample.time = strftime(timesample, 32, "%b,%d,%H:%M", localtime(&seconds));
+        strftime(timesample, 32, "%b:%d:(%H:%M)", localtime(&seconds));
+        PrintQueue.call(printf, "Time: %s\n\r", timesample);
+        sample.time = timesample;
         SDBuffer.Put(sample); //put new sample on buffer
 
         count++;

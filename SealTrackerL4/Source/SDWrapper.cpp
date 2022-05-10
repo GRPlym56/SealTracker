@@ -32,7 +32,7 @@ SDCARD::SDCARD(SPIConfig_t pins, CircBuff* SDBuff): SD(SDpins.MOSI, SDpins.MISO,
     {
     
         //PrintQueue.call(printf, "Write to SD: %s, %s\n\r", output.pressure.c_str(), output.temperature.c_str()); //write each n byte line
-        fprintf(samplefile, "Ligma ,Balls\n"); 
+        fprintf(samplefile, "Pressure mbar ,Temperature C, Time\n"); 
         
         //SDLock.unlock();
         //Tidy up here
@@ -125,7 +125,7 @@ int SDCARD::flush() //flush all samples from buffer to
 void SDCARD::ManageSD() //to run in its own low priority thread
 {
 
-    ThisThread::sleep_for(300s); //sleep for 5 mins     
+    ThisThread::sleep_for(30s); //sleep for 5 mins     
     flush(); // flush samples to SD
     
 }
