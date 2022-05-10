@@ -110,7 +110,7 @@ void UpdateSamplers()
 
         count++;
         PrintQueue.call(printf, "--Count: %d--\r\n", count);
-        if(count == 5) 
+        if(count == 1) 
         {
             DiveBuff.Put(sample); //update dive characteristic buffer every 5 mins
             count = 0;

@@ -110,8 +110,9 @@ bool CircBuff::FullCheck(void)
 {
     if(currentsize == max_size)
     {
-        return 1; //buffer full
         PrintQueue.call(printf, "%s buffer full\n\r", name);
+        return 1; //buffer full
+        
     }else 
     {
         return 0; //buffer not full
@@ -124,8 +125,9 @@ bool CircBuff::EmptyCheck(void)
    
     if(currentsize == 0)
     {
-        return 1; //buffer empty
         PrintQueue.call(printf, "%s buffer empty\n\r", name);
+        return 1; //buffer empty
+        
     }else 
     {
         return 0; //buffer not empty
@@ -133,6 +135,31 @@ bool CircBuff::EmptyCheck(void)
 
         
 }
+
+
+bool CircBuff::IsEmpty(void) //public version with mutex since it can happen anywhere
+{
+    if(Bufferlock.trylock_for(5s))
+    {
+        if(currentsize == 0)
+        {
+            Bufferlock.unlock();
+            PrintQueue.call(printf, "%s buffer empty\n\r", name);
+            return 1; //buffer empty
+            
+        }else 
+        {
+            Bufferlock.unlock();
+            return 0; //buffer not empty
+        }
+        
+    }else 
+    {
+        PrintQueue.call(printf, "%s Fault: 'IsEmpty' trylock failed\n\r", name);
+        return 1; //effectively empty if fault occurs
+    }
+}
+
 
 void CircBuff::IncrementHead(void)
 {

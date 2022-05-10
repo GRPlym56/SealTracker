@@ -91,31 +91,28 @@ void CommsWrapper::ReceiveData()
 
 void CommsWrapper::Decode()
 {
+    sealsample_t newsample;
     std::string s; //string for holding receive data
     std::string delimiter = "|"; //delimiter for splitting strings
     //std::string token;
     
     s = rxData;
     size_t pos = 0;
-    std::string token;
-    int count = 0;
+    std::string token[3];
+    unsigned short count = 0;
     while ((pos = s.find(delimiter)) != std::string::npos) {
-        token = s.substr(0, pos);
-        //std::cout << token << std::endl;
-        if(count == 0)
-        {
-            rxDataFormatted.pressure = token;
-        }else if(count == 1)
-        {
-            rxDataFormatted.temperature = token;
-        }
-        s.erase(0, pos + delimiter.length());
+        token[count] = s.substr(0, pos);
+        //PrintQueue.call(printf, "format: %s\n\r", token[count].c_str());
         count++;
+        s.erase(0, pos + delimiter.length());
     }
     //put newly acquired date on appropriate buffers
-    
-    sdbuff->Put(rxDataFormatted); 
-    netbuff->Put(rxDataFormatted);
+    newsample.pressure = token[0];
+    newsample.temperature = token[1];
+    newsample.time = token[2];
+
+    sdbuff->Put(newsample); 
+    netbuff->Put(newsample);
 
     //osSignalSet(AzureThread, AzureFlag); //there is now data to 
 
@@ -132,6 +129,7 @@ void CommsWrapper::WaitForRequest()
     InitReceiveNode();
     
     do{    
+        //PrintQueue.call(printf, "Ready for time request\n\r");
         if( Comms.readable() ) { // ugly rapid polling
             //PrintQueue.call(printf, ("Data ready\n\r"));
     
@@ -146,7 +144,7 @@ void CommsWrapper::WaitForRequest()
                     
             }
             LED = !LED;
-            PrintQueue.call(printf, "%s", rxData);
+            PrintQueue.call(printf, "%s\n\r", rxData);
            
             if(strncmp(rxData, "Time Please", 11) == 0)
             {

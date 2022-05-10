@@ -35,7 +35,6 @@ class CommsWrapper
     int rxDataCnt = 0;
 
     DigitalOut LED;
-    sealsample_t rxDataFormatted;
 
     CircBuff* sdbuff;
     CircBuff* netbuff;

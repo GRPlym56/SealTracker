@@ -40,7 +40,7 @@ void SealSubmersion::SurfaceDetection()
             {
                 char message[32];
                 sealsampleL4_t sample = Buffer->Get();
-                sprintf(message, "%4.1f|%2.1f", sample.pressure, sample.temperature); //format message
+                sprintf(message, "%4.1f|%2.1f|%s", sample.pressure, sample.temperature, sample.time.c_str()); //format message
                 NRF->DataDump(message); //send sample
             }
             NRF->Off();

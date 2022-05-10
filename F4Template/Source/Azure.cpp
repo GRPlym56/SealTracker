@@ -139,14 +139,14 @@ void Azure::SendData() {
             // If we have received a message from the cloud, don't send more messeges
             break;
         }
-        ThisThread::sleep_for(250ms); //does not need to rapidly poll, NRF data in is higher priority
+        //ThisThread::sleep_for(250ms); //does not need to rapidly poll, NRF data in is higher priority
         ThisThread::flags_wait_all(AzureFlag, false); //wait on a flag, dont clear until we are certain the buffer is empty
 
-        if(NetBuffer->EmptyCheck())
+        if(NetBuffer->IsEmpty())
         {
 
             PrintQueue.call(printf, "Netbuff empty, nothing to send\n");
-            ThisThread::flags_clear(AzureFlag); //clear flag
+            ThisThread::sleep_for(5s); //check every 5 seconds
             
         }else 
         {
@@ -159,6 +159,7 @@ void Azure::SendData() {
                 }
 
             */
+            PrintQueue.call(printf, "---arrived in data sending---\n\r");
             sealsample_t outputData = NetBuffer->Get(); //get samples from buffer 
             
             sprintf(message, "{ \"Pressure\" : %s, \"Temperature\" : %s, \"Time\" : %s }", outputData.pressure.c_str(), outputData.temperature.c_str(), outputData.time.c_str());

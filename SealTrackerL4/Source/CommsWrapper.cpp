@@ -76,6 +76,7 @@ void CommsWrapper::DataDump(char msg[])
 void CommsWrapper::RequestTime()
 {
     bool done = false;
+    PrintQueue.call(printf, "Requesting time from 429\n\r");
     Sendmsg("Time Please"); //request time from the F429
     InitReceiveNode();
     
@@ -92,7 +93,7 @@ void CommsWrapper::RequestTime()
                     
             }
             PrintQueue.call(printf, "message received\n\r");
-
+            done = true;
             int time =  stoi(rxData); //convert receive string to integer 
             set_time(time); //set up RTC
         }

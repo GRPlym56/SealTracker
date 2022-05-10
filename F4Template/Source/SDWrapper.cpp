@@ -31,7 +31,7 @@ SDCARD::SDCARD(SPIConfig_t pins, CircBuff* SDBuff): SD(pins.MOSI, SDpins.MISO, S
     {
     
         //PrintQueue.call(printf, "Write to SD: %s, %s\n\r", output.pressure.c_str(), output.temperature.c_str()); //write each n byte line
-        fprintf(samplefile, "Pressure mBar,Temperature C\n"); 
+        fprintf(samplefile, "Pressure mBar,Temperature C, Time\n"); 
         
         //SDLock.unlock();
         //Tidy up here
@@ -120,7 +120,7 @@ int SDCARD::flush() //flush all samples from buffer to
             fprintf(ft, "%s\n", output.temperature.c_str());
             */
             
-            fprintf(samplefile, "%s,%s\n", output.pressure.c_str(), output.temperature.c_str());
+            fprintf(samplefile, "%s,%s\n", output.pressure.c_str(), output.temperature.c_str(), output.time.c_str());
             
         }
         //SDLock.unlock();

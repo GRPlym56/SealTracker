@@ -19,7 +19,7 @@ class CircBuff
         void Put(sealsample_t newsample);
         sealsample_t Get(void);
         sealsample_t Peek(void);
-        bool EmptyCheck(void);
+        bool IsEmpty(void);
         unsigned int GetSize(void);
         
 
@@ -31,7 +31,7 @@ class CircBuff
         Mutex Bufferlock; //Mutex lock for handling mutable data 
 
         
-        
+        bool EmptyCheck(void);
         const unsigned int max_size;          //size of buffer
         const unsigned int max_index;
         volatile unsigned int head = 0;           //first element in buffer
