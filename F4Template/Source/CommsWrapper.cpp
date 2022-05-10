@@ -10,9 +10,17 @@ CommsWrapper::CommsWrapper(NRFPINS Pins, DigitalOut CommsLED, CircBuff* SD, Circ
 
 void CommsWrapper::InitSendNode()
 {
-    Comms.setTransferSize(32); //maximum message size 
+    PrintQueue.call(printf, "nRF24L01+ Frequency    : %d MHz\r\n",  Comms.getRfFrequency() );
+    PrintQueue.call(printf, "nRF24L01+ Output power : %d dBm\r\n",  Comms.getRfOutputPower() );
+    PrintQueue.call(printf, "nRF24L01+ Data Rate    : %d kbps\r\n", Comms.getAirDataRate() );
+    PrintQueue.call(printf, "nRF24L01+ TX Address   : 0x%010llX\r\n", Comms.getTxAddress() );
+    PrintQueue.call(printf, "nRF24L01+ RX Address   : 0x%010llX\r\n", Comms.getRxAddress() );
+
+    Comms.setAirDataRate(NRF24L01P_DATARATE_1_MBPS);
+    Comms.setTransferSize(TRANSFER_SIZE); //maximum message size 
     Comms.setTransmitMode(); 
     Comms.enable(); //go!
+    PrintQueue.call(printf, "Send mode set\n\r");
    
 }
 
@@ -28,14 +36,29 @@ void CommsWrapper::InitReceiveNode()
     Comms.setTransferSize(32); //maximum message size 
     Comms.setReceiveMode(); 
     Comms.enable(); //go!
-    PrintQueue.call(printf, ("Receive mode set\n\r"));
+    PrintQueue.call(printf, "Receive mode set\n\r");
 }
 
-/*TODO
-fix printing issue,
-get the samples sent to azure
-get the samples on the SD card
-*/
+void CommsWrapper::Sendmsg(char msg[]) //function for sending one message
+{
+    //unsigned int length = strlen(msg);
+    if(strlen(msg) <= 32)
+    {
+        Comms.powerUp(); //reactivate comms
+        PrintQueue.call(printf, "Sending message:\n\r");
+       
+        Comms.write( NRF24L01P_PIPE_P0, msg, TRANSFER_SIZE); //send message
+        ThisThread::sleep_for(25ms);
+        //power down and disable comms after message sent to save power
+        Comms.powerDown();
+        Comms.disable();
+    }
+    else
+    {
+        PrintQueue.call(printf, "Message too long \n\r");
+    }
+}
+
 void CommsWrapper::ReceiveData()
 {
     
@@ -43,7 +66,7 @@ void CommsWrapper::ReceiveData()
         
         
         
-        if ( Comms.readable() ) { //rapid polling pepega
+        if ( Comms.readable() ) { // ugly rapid polling 
             //PrintQueue.call(printf, ("Data ready\n\r"));
  
             // ...read the data into the receive buffer
@@ -101,4 +124,48 @@ void CommsWrapper::Decode()
 void CommsWrapper::SetAzureThreadID(osThreadId_t threadID)
 {
     AzureThread = threadID;
+}
+
+void CommsWrapper::WaitForRequest()
+{
+    bool done = false;
+    InitReceiveNode();
+    
+    do{    
+        if( Comms.readable() ) { // ugly rapid polling
+            //PrintQueue.call(printf, ("Data ready\n\r"));
+    
+            // ...read the data into the receive buffer
+            rxDataCnt = Comms.read( NRF24L01P_PIPE_P0, rxData, sizeof( rxData ) );
+                
+            // Display the receive buffer contents via the host serial link
+            for ( int i = 0; rxDataCnt > 0; rxDataCnt--, i++ ) {
+
+                char a = rxData[i];
+                //printf("%c", a);
+                    
+            }
+            LED = !LED;
+            PrintQueue.call(printf, "%s", rxData);
+           
+            if(strncmp(rxData, "Time Please", 11) == 0)
+            {
+                ThisThread::sleep_for(250ms); //give a generous time window for the L432 to change to receive mode
+                PrintQueue.call(printf, "L432 requests time\n\r");
+                InitSendNode();
+                time_t seconds = time(NULL);
+                char EpochTime[32];
+                sprintf(EpochTime, "%d", seconds); //convert time to char array for sending
+                Sendmsg(EpochTime);
+                done = true; //exit loop
+
+            }else{
+                PrintQueue.call(printf, "unknown request\n\r");
+            }
+           
+            
+
+        }
+
+    }while(done == false);
 }

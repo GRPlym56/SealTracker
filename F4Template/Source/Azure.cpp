@@ -11,12 +11,12 @@
 
 Azure::Azure(CircBuff* NetBuff): NetBuffer(NetBuff) 
 {
-   /* 
+   
     Connect();
     
     setTime();
     Sendrate = 10s;
-    */
+    
 
 }
 
@@ -42,7 +42,6 @@ bool Azure::Connect()
     return true;
 }
 
-
 bool Azure::setTime()
 {
     PrintQueue.call(printf, "Getting time from the NTP server\n\r");
@@ -50,7 +49,7 @@ bool Azure::setTime()
 
     NTPClient ntp(_defaultSystemNetwork);
     ntp.set_server("time.google.com", 123);
-    timestamp = ntp.get_timestamp();
+    timestamp = ntp.get_timestamp(); //time epoch format, we need this to set the rtc correctly on the L432
     tm *ltm = localtime(&timestamp);
     if (timestamp < 0) {
         PrintQueue.call(printf, "Failed to update the current time, error: %ud\n\r", timestamp);
@@ -60,7 +59,6 @@ bool Azure::setTime()
     set_time(timestamp);
     return true;
 }
-
 
 void Azure::SendData() {
     //bool trace_on = MBED_CONF_APP_IOTHUB_CLIENT_TRACE;

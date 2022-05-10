@@ -44,11 +44,16 @@ void SDFlush();
 
 int main() {
 
-    set_time(1652184653); //12:10 may 10th 2022
+    
 
     PrintThread.start(Printer); //should start before every other thread
     microSD.Test();
     NRF.InitSendNode();
+
+    NRF.RequestTime(); //get time from F429 and setup RTC
+
+    NRF.InitSendNode(); //reinit send mode
+
     PressSens.MS5837Init();
     DiveTracker.GetAmbientDepth();
     

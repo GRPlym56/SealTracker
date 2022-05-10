@@ -30,7 +30,7 @@ void CommsWrapper::InitSendNode()
 
 void CommsWrapper::InitReceiveNode()
 {
-    Comms.setAirDataRate(NRF24L01P_DATARATE_250_KBPS);
+    Comms.setAirDataRate(NRF24L01P_DATARATE_1_MBPS);
     Comms.setTransferSize(TRANSFER_SIZE); //maximum message size 
     Comms.setReceiveMode(); 
     Comms.enable(); //go!
@@ -71,6 +71,36 @@ void CommsWrapper::DataDump(char msg[])
     {
         PrintQueue.call(printf, "Error: Message too long \n\r");
     }
+}
+
+void CommsWrapper::RequestTime()
+{
+    bool done = false;
+    Sendmsg("Time Please"); //request time from the F429
+    InitReceiveNode();
+    
+    do
+    {
+        if(Comms.readable())
+        {
+            rxDataCnt = Comms.read( NRF24L01P_PIPE_P0, rxData, sizeof( rxData ) );
+                
+            // Display the receive buffer contents via the host serial link
+            for ( int i = 0; rxDataCnt > 0; rxDataCnt--, i++ ) {
+
+                char a = rxData[i];
+                    
+            }
+            PrintQueue.call(printf, "message received\n\r");
+
+            int time =  stoi(rxData); //convert receive string to integer 
+            set_time(time); //set up RTC
+        }
+
+
+    }while(done == false);
+
+
 }
 
 void CommsWrapper::On()

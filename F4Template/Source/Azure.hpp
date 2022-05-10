@@ -38,6 +38,7 @@ class Azure
         bool Connect();
         void SendData();
         bool setTime();
+      
 
         CircBuff* NetBuffer;
         

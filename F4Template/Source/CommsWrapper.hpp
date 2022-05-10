@@ -8,19 +8,22 @@
 #include <iostream>
 #include <string>
 
+#define TRANSFER_SIZE 32
+
 extern EventQueue PrintQueue;
-
-
 
 class CommsWrapper
 {
     public:
 
     CommsWrapper(NRFPINS pins, DigitalOut CommsLED, CircBuff* SD, CircBuff* Net);
+    void Sendmsg(char msg[]);
     void ReceiveData();
     void InitSendNode();
     void InitReceiveNode();
     void Decode();
+
+    void WaitForRequest();
 
     void SetAzureThreadID(osThreadId_t threadID);
 

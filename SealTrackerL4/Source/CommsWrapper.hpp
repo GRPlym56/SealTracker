@@ -24,6 +24,8 @@ class CommsWrapper
     void Sendmsg(char msg[]);
     void DataDump(char msg[]);
 
+    void RequestTime();
+
     void On();
     void Off();
   
