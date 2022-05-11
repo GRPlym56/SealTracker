@@ -146,12 +146,13 @@ void Azure::SendData() {
         {
 
             PrintQueue.call(printf, "Netbuff empty, nothing to send\n");
-            ThisThread::sleep_for(5s); //check every 5 seconds
+            ThisThread::flags_clear(AzureFlag);
+            //ThisThread::sleep_for(5s); //check every 5 seconds
             
         }else 
         {
-                //Send data in this format:
             /*
+                send data in this format:
                 {
                     "Pressure" : 1000.5,
                     "Temperature" : 21.3
@@ -159,7 +160,7 @@ void Azure::SendData() {
                 }
 
             */
-            PrintQueue.call(printf, "---arrived in data sending---\n\r");
+            
             sealsample_t outputData = NetBuffer->Get(); //get samples from buffer 
             
             sprintf(message, "{ \"Pressure\" : %s, \"Temperature\" : %s, \"Time\" : %s }", outputData.pressure.c_str(), outputData.temperature.c_str(), outputData.time.c_str());

@@ -114,7 +114,7 @@ void CommsWrapper::Decode()
     sdbuff->Put(newsample); 
     netbuff->Put(newsample);
 
-    //osSignalSet(AzureThread, AzureFlag); //there is now data to 
+    osSignalSet(AzureThread, AzureFlag); //there is now data to send to azure
 
 }
 

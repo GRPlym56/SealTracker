@@ -31,14 +31,17 @@ int main() {
 
     //startup section, attempt to send time to L432kc
     PrintThread.start(Printer);
+  
+    
 
     RFModule.WaitForRequest(); //wait for the L432 to request time
 
     RFModule.InitReceiveNode();
     RFThread.start(ReceiveData);
-    
+    RFModule.SetAzureThreadID(AzureThread.get_id()); //give azure thread ID to rf module so it can set signals
     AzureThread.start(Networking);
-   
+    
+
     microSD.Test(); //write a simple text file 
     
 
