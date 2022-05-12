@@ -44,6 +44,7 @@ class SealSubmersion
     volatile float pressure_offset; //ambient pressure value in depth 
 
     unsigned int delay = 5; //default delay 5s
+    Timer RestTimer;
 
     sealstate_t SEAL_STATE;
    

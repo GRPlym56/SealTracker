@@ -23,15 +23,24 @@ void SealSubmersion::SurfaceDetection()
 
     if(depth[NOW] < 0.1) //check if data transmission is possible
     {
-        NRF->On();
-        while(!Buffer->IsEmpty()) //repeat until buffer is empty
+        SetSealState(sealstate_t::SURFACE); //until we have determined that the seal is resting, assume surface
+        if(!Buffer->IsEmpty()){
+            NRF->On();
+            while(!Buffer->IsEmpty()) //repeat until buffer is empty
+            {
+                char message[32];
+                sealsampleL4_t sample = Buffer->Get(); //get data off buffer
+                sprintf(message, "%4.1f|%2.1f|%s|%d", sample.pressure, sample.temperature, sample.time.c_str(), sample.state); //format message
+                NRF->SendmsgNoPwrCntrl(message); //send message
+            }
+            NRF->Off();
+        }else 
         {
-            char message[32];
-            sealsampleL4_t sample = Buffer->Get(); //get data off buffer
-            sprintf(message, "%4.1f|%2.1f|%s|%d", sample.pressure, sample.temperature, sample.time.c_str(), sample.state); //format message
-            NRF->SendmsgNoPwrCntrl(message); //send message
+            RestTimer.start();
         }
-        NRF->Off();
+       
+
+
     }
 
     if(delta_depth > 1) //if depth has increased by 1m
@@ -42,12 +51,18 @@ void SealSubmersion::SurfaceDetection()
     }else if(delta_depth < -1) //if depth has decreased by 1m
     {
         SetSealState(sealstate_t::ASCENDING);
-        delay -= 2; //reduce delay, but at a greater rate than the delay increase to improve reactivity
+        delay -= 2; //reduce delay, but at a greater rate than the delay increase to increase reactivity
 
-    }else //depth maintained within threshold, cruie
+    }else //depth maintained within threshold, cruising or resting
     {
-        SetSealState(sealstate_t::CRUISING); 
-        delay = 5; //reset delay, cruises are often shorter than dive/ascension periods
+        if(RestTimer.elapsed_time() > 60s)
+        {
+            SetSealState(sealstate_t::RESTING); 
+        }else {
+            SetSealState(sealstate_t::CRUISING);
+        }
+
+
     }
     PrintQueue.call(printf, "Delay: %d\n\r", delay);
     ThisThread::sleep_for(delay*1000); 
