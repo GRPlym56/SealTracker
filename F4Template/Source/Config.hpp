@@ -9,7 +9,18 @@ December-January 2022
 #include <iostream>
 #include <string>
 
-#define AzureFlag (1UL << 9) //flag for azure to wait on
+#define AzureFlag (1UL << 1) //flag for azure to wait on
+
+enum class sealstate_t
+{
+    RESTING = 0,
+    CRUISING = 1,
+    DIVING = 2,
+    ASCENDING = 3,
+    SURFACE = 4,
+    UNKNOWN = 5
+
+};
 
 typedef struct  //template struct for SPI devices
 {
@@ -35,6 +46,7 @@ typedef struct
     std::string pressure;
     std::string temperature;
     std::string time;
+    std::string state;
 
 } sealsample_t;
 

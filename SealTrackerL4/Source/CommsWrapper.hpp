@@ -22,7 +22,7 @@ class CommsWrapper
     void InitSendNode();
     void InitReceiveNode();
     void Sendmsg(char msg[]);
-    void DataDump(char msg[]);
+    void SendmsgNoPwrCntrl(char msg[]);
 
     void RequestTime();
 

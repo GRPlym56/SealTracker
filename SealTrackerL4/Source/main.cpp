@@ -24,14 +24,14 @@
 EventQueue PrintQueue;
 
 CommsWrapper NRF(RFPINS);
-CircBuff SDBuffer(256, "SDBuff"); //main buffer for getting samples to the SD card
-SDCARD microSD(SDpins, &SDBuffer);
+CircBuff MainSDBuffer(256, "MainSDBuff"); //main buffer for getting samples to the SD card
+SDCARD microSD(SDpins, &MainSDBuffer);
 
 MS5837 PressSens(PA_10, PA_9); //SDA, SCL
 
 
-CircBuff DiveBuff(128, "DiveBuff"); //secondary buffer for live readout of data characterising dive behaviour on azure
-SealSubmersion DiveTracker(&DiveBuff, &NRF, &PressSens); 
+CircBuff ChrDiveBuff(256, "ChrDiveBuff"); //secondary buffer for live readout of data characterising general dive behaviour on azure
+SealSubmersion DiveTracker(&ChrDiveBuff, &NRF, &PressSens); 
 
 
 Thread PrintThread, SDThread, SamplerThread;
@@ -40,6 +40,7 @@ Thread PrintThread, SDThread, SamplerThread;
 void UpdateSamplers();
 void Printer();
 void SDFlush();
+std::string setComment(sealstate_t state);
 
 
 int main() {
@@ -90,7 +91,7 @@ int main() {
 
 void UpdateSamplers()
 {
-    volatile unsigned short count = 0;
+    volatile unsigned int count;
     while(1)
     {  
         sealsampleL4_t sample;
@@ -106,16 +107,13 @@ void UpdateSamplers()
         strftime(timesample, 32, "%b:%d:(%H:%M)", localtime(&seconds));
         PrintQueue.call(printf, "Time: %s\n\r", timesample);
         sample.time = timesample;
-        SDBuffer.Put(sample); //put new sample on buffer
-
-        count++;
-        PrintQueue.call(printf, "--Count: %d--\r\n", count);
-        if(count == 1) 
+        sample.state = DiveTracker.GetSealState();
+        MainSDBuffer.Put(sample); //put new sample on buffer
+        if(count >= 5)
         {
-            DiveBuff.Put(sample); //update dive characteristic buffer every 5 mins
-            count = 0;
-    
+            ChrDiveBuff.Put(sample); //update dive characteristic buffer
         }
+       
         ThisThread::sleep_for(5s);
     }
 }
@@ -133,5 +131,7 @@ void SDFlush()
         microSD.ManageSD(); //flushes samples from buffer to SD after set period
     }
 }
+
+
 
 

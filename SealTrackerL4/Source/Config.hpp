@@ -10,6 +10,17 @@
 #include <string>
 
 
+enum class sealstate_t
+{
+    RESTING = 0,
+    CRUISING = 1,
+    DIVING = 2,
+    ASCENDING = 3,
+    SURFACE = 4,
+    UNKNOWN = 5
+
+};
+
 typedef struct  //template struct for SPI devices
 {
     PinName MOSI;
@@ -34,6 +45,7 @@ typedef struct
     float pressure;
     float temperature;
     std::string time;
+    sealstate_t state;
 
 } sealsampleL4_t;
 
@@ -52,5 +64,7 @@ const NRFPINS RFPINS
     PB_5_ALT0, PB_4_ALT0, PB_3_ALT0, PA_4_ALT0, PB_1, PA_8, 
 
 };
+
+
 
 #endif

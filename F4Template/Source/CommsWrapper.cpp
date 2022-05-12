@@ -98,7 +98,7 @@ void CommsWrapper::Decode()
     
     s = rxData;
     size_t pos = 0;
-    std::string token[3];
+    std::string token[4];
     unsigned short count = 0;
     while ((pos = s.find(delimiter)) != std::string::npos) {
         token[count] = s.substr(0, pos);
@@ -110,6 +110,7 @@ void CommsWrapper::Decode()
     newsample.pressure = token[0];
     newsample.temperature = token[1];
     newsample.time = token[2];
+    newsample.state = token[3];
 
     sdbuff->Put(newsample); 
     netbuff->Put(newsample);

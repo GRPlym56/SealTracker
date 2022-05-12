@@ -9,18 +9,15 @@
 #include "platform/mbed_thread.h"
 #include "CommsWrapper.hpp"
 #include "SDWrapper.hpp"
+#include "Config.hpp"
 #include "MS5837.h"
 
 
+
 extern EventQueue PrintQueue;
+
 typedef enum {NOW = 0, PREVIOUS = 1}delta;
 
-template <typename T>
-auto seconds_to_duration(T seconds) 
-{
-    return std::chrono::duration<T, std::ratio<1>>(seconds);
-}
-//extern MS5837 PressSens;
 
 class SealSubmersion
 {
@@ -30,9 +27,13 @@ class SealSubmersion
     void SurfaceDetection();
     void UpdateDepth();
     void GetAmbientDepth();
+    sealstate_t GetSealState();
+    void SetSealState(sealstate_t newstate);
 
 
     private:
+
+    Mutex BlubberLock;
 
     CircBuff* Buffer;
     CommsWrapper* NRF;
@@ -42,8 +43,9 @@ class SealSubmersion
     volatile float delta_depth; //track difference in depth
     volatile float pressure_offset; //ambient pressure value in depth 
 
-    unsigned int delay = 5; //default delay 5s]
+    unsigned int delay = 5; //default delay 5s
 
+    sealstate_t SEAL_STATE;
    
 
 

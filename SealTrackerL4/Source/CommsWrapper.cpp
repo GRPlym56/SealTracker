@@ -11,17 +11,18 @@ CommsWrapper::CommsWrapper(NRFPINS Pins): Comms(Pins.mosi, Pins.miso, Pins.sck, 
 
 void CommsWrapper::InitSendNode()
 {
+    /*
     PrintQueue.call(printf, "nRF24L01+ Frequency    : %d MHz\r\n",  Comms.getRfFrequency() );
     PrintQueue.call(printf, "nRF24L01+ Output power : %d dBm\r\n",  Comms.getRfOutputPower() );
     PrintQueue.call(printf, "nRF24L01+ Data Rate    : %d kbps\r\n", Comms.getAirDataRate() );
     PrintQueue.call(printf, "nRF24L01+ TX Address   : 0x%010llX\r\n", Comms.getTxAddress() );
     PrintQueue.call(printf, "nRF24L01+ RX Address   : 0x%010llX\r\n", Comms.getRxAddress() );
-
+    */
     Comms.setAirDataRate(NRF24L01P_DATARATE_1_MBPS);
     Comms.setTransferSize(32); //maximum message size 
     Comms.setTransmitMode(); 
     Comms.enable(); //go!
-
+    PrintQueue.call(printf, ("Send mode set\n\r"));
     // Display the setup of the nRF24L01+ chip
     
 
@@ -58,18 +59,16 @@ void CommsWrapper::Sendmsg(char msg[]) //function for sending one message
 }
 
 //function for sending data when lots of data needs to be sent quickly, it is on the user to manage power once it is done
-void CommsWrapper::DataDump(char msg[]) 
+void CommsWrapper::SendmsgNoPwrCntrl(char msg[]) 
 {
     //unsigned int length = strlen(msg);
     if(strlen(msg) <= 32)
     {   
         Comms.write( NRF24L01P_PIPE_P0, msg, TRANSFER_SIZE); //send message
-        ThisThread::sleep_for(25ms); //this needs to be tuned
-
     }
     else
     {
-        PrintQueue.call(printf, "Error: Message too long \n\r");
+        PrintQueue.call(printf, "Message too long \n\r");
     }
 }
 

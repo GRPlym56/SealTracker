@@ -105,8 +105,9 @@ int SDCARD::flush() //flush all samples from buffer to
             for(int i = 0; i<size; i++) //loop for as many samples as we have
             { 
                 output = SDBuffer->Get();
+
                 
-                fprintf(samplefile, "%f,%f,%s\n", output.pressure, output.temperature, output.time.c_str());
+                fprintf(samplefile, "%f,%f,%s,%d\n", output.pressure, output.temperature, output.time.c_str(), output.state);
                 
             }
             //SDLock.unlock();
