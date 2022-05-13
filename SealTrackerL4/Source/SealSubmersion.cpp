@@ -21,60 +21,72 @@ void SealSubmersion::SurfaceDetection()
 
     UpdateDepth(); //measure depth in metres and produce a delta
 
-    if(depth[NOW] < 0.1) //check if data transmission is possible
+    if(depth[NOW] < 0.1)
     {
-        SetSealState(sealstate_t::SURFACE); //until we have determined that the seal is resting, assume surface
-        if(!Buffer->IsEmpty()){
+        if(!Buffer->IsEmpty()){ //check if buffer is empty before turning comms on
+
             NRF->On();
-            while(!Buffer->IsEmpty()) //repeat until buffer is empty
+            do 
             {
                 char message[32];
                 sealsampleL4_t sample = Buffer->Get(); //get data off buffer
                 sprintf(message, "%4.1f|%2.1f|%s|%d", sample.pressure, sample.temperature, sample.time.c_str(), sample.state); //format message
-                NRF->SendmsgNoPwrCntrl(message); //send message
-            }
+                NRF->SendmsgNoPwrCntrl(message); //send message  
+            }while(!Buffer->IsEmpty()); //repeat until buffer is empty
+
             NRF->Off();
+        }
+        RestTimer.start();
+        if(RestTimer.elapsed_time() >= 60s)
+        {
+            //seal is probably hauled out
+            SetSealState(sealstate_t::RESTING);
+            RestTimer.stop();
+            RestTimer.reset();
+
+            delay = 30000; //if seal is hauled out then nothing exciting will happen anytime soon, slow down
         }else 
         {
-            RestTimer.start();
+            SetSealState(sealstate_t::SURFACE);
+            delay = 5000; //reset delay as seal may be about to dive or haul
         }
-       
-
-
-    }
-
-    if(delta_depth > 1) //if depth has increased by 1m
-    {
-        SetSealState(sealstate_t::DIVING);
-        delay++; //depth increasing, chance of surfacing soon becoming more unlikely
         
-    }else if(delta_depth < -1) //if depth has decreased by 1m
+            
+    }else if(delta_depth > 1 ) //seal diving?
     {
+        RestTimer.stop();
+        RestTimer.reset();
+        SetSealState(sealstate_t::DIVING);
+        
+        delay = 5000; //moderate day to keep track of the dive
+        
+    }else if(delta_depth < 1) //seal ascending?
+    {
+        RestTimer.stop();
+        RestTimer.reset();
         SetSealState(sealstate_t::ASCENDING);
-        delay -= 2; //reduce delay, but at a greater rate than the delay increase to increase reactivity
 
-    }else //depth maintained within threshold, cruising or resting
+        delay = 5000; //moderate delay, dont want to miss a surfacing
+        
+    }else //seal must be maintaining its course or has just dipped back in the water
     {
-        if(RestTimer.elapsed_time() > 60s)
-        {
-            SetSealState(sealstate_t::RESTING); 
-        }else {
-            SetSealState(sealstate_t::CRUISING);
-        }
-
-
+        RestTimer.stop();
+        RestTimer.reset();
+        SetSealState(sealstate_t::CRUISING);
+        delay = ((unsigned int)depth*3000)/10; //larger delay the deeper the seal is (example: 100m depth = (100*3)/10 = 30s delay)
     }
-    PrintQueue.call(printf, "Delay: %d\n\r", delay);
-    ThisThread::sleep_for(delay*1000); 
-}
 
+    ThisThread::sleep_for(delay);
+}
 
 void SealSubmersion::UpdateDepth() //measures current pressure value and updates depth
 {
-    depth[PREVIOUS] = depth[NOW]; //update prior value
+    //update prior value
+    depth[PREVIOUS] = depth[NOW]; 
+    
 
     Sensor->Barometer_MS5837(); //update values
-    float Pressure = Sensor->MS5837_Pressure();
+    float Pressure = Sensor->MS5837_Pressure(); //get pressure value from sensor class
     
     
     depth[NOW] = (Pressure - pressure_offset)/100.52; //remove ambient surface pressure, divide by 100.52 to get depth in metres
