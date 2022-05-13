@@ -21,10 +21,10 @@ void SealSubmersion::SurfaceDetection()
 
     UpdateDepth(); //measure depth in metres and produce a delta
 
-    if(depth[NOW] < 0.1)
+    if(depth[NOW] < 1000.0f) 
     {
         if(!Buffer->IsEmpty()){ //check if buffer is empty before turning comms on
-
+            PrintQueue.call(printf, "Buffer not empty, let's send data\n\r");
             NRF->On();
             do 
             {
@@ -86,7 +86,7 @@ void SealSubmersion::UpdateDepth() //measures current pressure value and updates
     
 
     Sensor->Barometer_MS5837(); //update values
-    float Pressure = Sensor->MS5837_Pressure(); //get pressure value from sensor class
+    volatile float Pressure = Sensor->MS5837_Pressure(); //get pressure value from sensor class
     
     
     depth[NOW] = (Pressure - pressure_offset)/100.52; //remove ambient surface pressure, divide by 100.52 to get depth in metres

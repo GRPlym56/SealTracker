@@ -155,7 +155,10 @@ void CommsWrapper::WaitForRequest()
                 time_t seconds = time(NULL);
                 char EpochTime[32];
                 sprintf(EpochTime, "%d", seconds); //convert time to char array for sending
-                Sendmsg(EpochTime);
+                for(int i = 0; i<5; i++)
+                {
+                    Sendmsg(EpochTime);
+                }
                 done = true; //exit loop
 
             }else{

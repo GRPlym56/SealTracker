@@ -59,7 +59,7 @@ void SDCARD::Test(void)
         //return -1;
     } else {
         //Put some text in the file...
-        fprintf(ftest, "Ligma Balls\n");
+        fprintf(ftest, "This is a text file\n");
         //Tidy up here
         fclose(ftest);
         PrintQueue.call(printf, ("SD Write done...\n"));
