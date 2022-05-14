@@ -24,13 +24,13 @@
 EventQueue PrintQueue;
 
 CommsWrapper NRF(RFPINS);
-CircBuff MainSDBuffer(256, "MainSDBuff"); //main buffer for getting samples to the SD card
+CircBuff MainSDBuffer(512, "MainSDBuff"); //main buffer for getting samples to the SD card
 SDCARD microSD(SDpins, &MainSDBuffer);
 
 MS5837 PressSens(PA_10, PA_9); //SDA, SCL
 
 
-CircBuff ChrDiveBuff(256, "ChrDiveBuff"); //secondary buffer for live readout of data characterising general dive behaviour on azure
+CircBuff ChrDiveBuff(512, "ChrDiveBuff"); //secondary buffer for live readout of data characterising general dive behaviour on azure
 SealSubmersion DiveTracker(&ChrDiveBuff, &NRF, &PressSens); 
 
 
@@ -118,15 +118,17 @@ void UpdateSamplers()
         sample.time = timesample;
         sample.state = DiveTracker.GetSealState();
         MainSDBuffer.Put(sample); //put new sample on buffer
-        
+        ChrDiveBuff.Put(sample);
+        /*
         count++;
-        if(count >= 1)
+        if(count >= 3)
         {
             ChrDiveBuff.Put(sample); //update dive characteristic buffer
             count = 0;
         }
+        */
        
-        ThisThread::sleep_for(5s);
+        ThisThread::sleep_for(10s);
     }
 }
 

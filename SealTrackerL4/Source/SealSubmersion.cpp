@@ -42,8 +42,7 @@ void SealSubmersion::SurfaceDetection()
         {
             //seal is probably hauled out
             SetSealState(sealstate_t::RESTING);
-            RestTimer.stop();
-            RestTimer.reset();
+            RestTimer.stop(); 
 
             delay = 5000; //if seal is hauled out then nothing exciting will happen anytime soon, slow down
         }else 

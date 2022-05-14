@@ -163,7 +163,7 @@ void Azure::SendData() {
             
             sealsample_t outputData = NetBuffer->Get(); //get samples from buffer 
             
-            sprintf(message, "{ \"Pressure\" : %s, \"Temperature\" : %s, \"Time\" : %s }", outputData.pressure.c_str(), outputData.temperature.c_str(), outputData.time.c_str());
+            sprintf(message, "{ \"Pressure\" : %f, \"Temperature\" : %f, \"Time\" : \"%s\" }", stof(outputData.pressure.c_str()), stof(outputData.temperature.c_str()), outputData.time.c_str());
             LogInfo("Sending: \"%s\"", message);
 
             message_handle = IoTHubMessage_CreateFromString(message);

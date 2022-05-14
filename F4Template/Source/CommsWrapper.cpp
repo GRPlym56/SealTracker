@@ -82,7 +82,7 @@ void CommsWrapper::ReceiveData()
                 
             }
            
-            PrintQueue.call(printf, "%s", rxData);
+            PrintQueue.call(printf, "%s\n\r", rxData);
             
             // Toggle LED2 (to help debug nRF24L01+ -> Host communication)
             Decode();

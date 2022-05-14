@@ -41,9 +41,10 @@ int main() {
     RFThread.start(ReceiveData);
     //RFThread.set_priority(osPriorityAboveNormal);
     
+    AzureThread.start(Networking);
     RFModule.SetAzureThreadID(AzureThread.get_id()); //give azure thread ID to rf module so it can set signals
     
-    //AzureThread.start(Networking);
+    
     
 
     microSD.Test(); //write a simple text file 
