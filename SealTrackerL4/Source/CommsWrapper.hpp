@@ -8,6 +8,8 @@
 #include <iostream>
 #include <string>
 
+#define DATARATE NRF24L01P_DATARATE_2_MBPS
+
 extern EventQueue PrintQueue;
 
 #define TRANSFER_SIZE 32 //max message size 

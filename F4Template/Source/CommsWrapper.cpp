@@ -10,32 +10,34 @@ CommsWrapper::CommsWrapper(NRFPINS Pins, DigitalOut CommsLED, CircBuff* SD, Circ
 
 void CommsWrapper::InitSendNode()
 {
+   
+
+    Comms.setAirDataRate(DATARATE);
+    Comms.setTransferSize(TRANSFER_SIZE); //maximum message size 
+    Comms.setTransmitMode(); 
+    Comms.enable(); //go!
     PrintQueue.call(printf, "nRF24L01+ Frequency    : %d MHz\r\n",  Comms.getRfFrequency() );
     PrintQueue.call(printf, "nRF24L01+ Output power : %d dBm\r\n",  Comms.getRfOutputPower() );
     PrintQueue.call(printf, "nRF24L01+ Data Rate    : %d kbps\r\n", Comms.getAirDataRate() );
     PrintQueue.call(printf, "nRF24L01+ TX Address   : 0x%010llX\r\n", Comms.getTxAddress() );
     PrintQueue.call(printf, "nRF24L01+ RX Address   : 0x%010llX\r\n", Comms.getRxAddress() );
-
-    Comms.setAirDataRate(NRF24L01P_DATARATE_1_MBPS);
-    Comms.setTransferSize(TRANSFER_SIZE); //maximum message size 
-    Comms.setTransmitMode(); 
-    Comms.enable(); //go!
     PrintQueue.call(printf, "Send mode set\n\r");
    
 }
 
 void CommsWrapper::InitReceiveNode()
 {
+    
+
+    Comms.setAirDataRate(DATARATE);
+    Comms.setTransferSize(32); //maximum message size 
+    Comms.setReceiveMode(); 
+    Comms.enable(); //go!
     PrintQueue.call(printf, "nRF24L01+ Frequency    : %d MHz\r\n",  Comms.getRfFrequency() );
     PrintQueue.call(printf, "nRF24L01+ Output power : %d dBm\r\n",  Comms.getRfOutputPower() );
     PrintQueue.call(printf, "nRF24L01+ Data Rate    : %d kbps\r\n", Comms.getAirDataRate() );
     PrintQueue.call(printf, "nRF24L01+ TX Address   : 0x%010llX\r\n", Comms.getTxAddress() );
     PrintQueue.call(printf, "nRF24L01+ RX Address   : 0x%010llX\r\n", Comms.getRxAddress() );
-
-    Comms.setAirDataRate(NRF24L01P_DATARATE_1_MBPS);
-    Comms.setTransferSize(32); //maximum message size 
-    Comms.setReceiveMode(); 
-    Comms.enable(); //go!
     PrintQueue.call(printf, "Receive mode set\n\r");
 }
 
@@ -155,7 +157,8 @@ void CommsWrapper::WaitForRequest()
                 time_t seconds = time(NULL);
                 char EpochTime[32];
                 sprintf(EpochTime, "%d", seconds); //convert time to char array for sending
-                for(int i = 0; i<5; i++)
+                ThisThread::sleep_for(1s); //give the L432 time to switch to receive mode
+                for(int i = 0; i<3; i++)
                 {
                     Sendmsg(EpochTime);
                 }

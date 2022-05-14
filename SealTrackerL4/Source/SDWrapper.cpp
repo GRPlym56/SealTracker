@@ -126,7 +126,7 @@ int SDCARD::flush() //flush all samples from buffer to
 void SDCARD::ManageSD() //to run in its own low priority thread
 {
 
-    ThisThread::sleep_for(30s); //sleep for 5 mins     
+    ThisThread::sleep_for(60s); //sleep for 5 mins     
     flush(); // flush samples to SD
     
 }

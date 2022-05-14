@@ -34,13 +34,16 @@ CircBuff ChrDiveBuff(256, "ChrDiveBuff"); //secondary buffer for live readout of
 SealSubmersion DiveTracker(&ChrDiveBuff, &NRF, &PressSens); 
 
 
-Thread PrintThread, SDThread, SamplerThread;
+Thread PrintThread, SDThread, SamplerThread, DiveThread;
+//Thread PrintThread(osPriorityNormal, OS_STACK_SIZE, nullptr, "Print Thread");
+
 
 
 void UpdateSamplers();
 void Printer();
 void SDFlush();
-std::string setComment(sealstate_t state);
+void Dive();
+
 
 
 int main() {
@@ -48,6 +51,7 @@ int main() {
     
 
     PrintThread.start(Printer); //should start before every other thread
+    
     microSD.Test();
     NRF.InitSendNode();
 
@@ -57,14 +61,19 @@ int main() {
 
     PressSens.MS5837Init();
     DiveTracker.GetAmbientDepth();
-    
+
+    //test loop
+   
+
+    DiveThread.start(Dive);
+    DiveThread.set_priority(osPriorityAboveNormal);
 
   
 
     //microSD.Test();
 
-    SDThread.start(SDFlush);
-    SDThread.set_priority(osPriorityLow); //low priority 
+    //SDThread.start(SDFlush);
+    //SDThread.set_priority(osPriorityLow); //low priority 
 
     
     SamplerThread.start(UpdateSamplers);
@@ -81,8 +90,8 @@ int main() {
     while(1) 
     {
         
-        DiveTracker.SurfaceDetection(); 
-        
+        //DiveTracker.SurfaceDetection(); 
+        microSD.ManageSD();
         
     }
 
@@ -109,8 +118,9 @@ void UpdateSamplers()
         sample.time = timesample;
         sample.state = DiveTracker.GetSealState();
         MainSDBuffer.Put(sample); //put new sample on buffer
+        
         count++;
-        if(count >= 5)
+        if(count >= 1)
         {
             ChrDiveBuff.Put(sample); //update dive characteristic buffer
             count = 0;
@@ -123,7 +133,11 @@ void UpdateSamplers()
 void Printer()
 {
     PrintQueue.call(printf, "starting printer\n");
-    PrintQueue.dispatch_forever();
+    while(1)
+    {
+        PrintQueue.dispatch_once();
+        ThisThread::sleep_for(25ms);
+    }
 }
 
 void SDFlush()
@@ -131,6 +145,14 @@ void SDFlush()
     while(1)
     {
         microSD.ManageSD(); //flushes samples from buffer to SD after set period
+    }
+}
+
+void Dive()
+{
+    while(1)
+    {
+        DiveTracker.SurfaceDetection();
     }
 }
 

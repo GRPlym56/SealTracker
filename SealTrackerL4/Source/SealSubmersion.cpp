@@ -25,16 +25,17 @@ void SealSubmersion::SurfaceDetection()
     {
         if(!Buffer->IsEmpty()){ //check if buffer is empty before turning comms on
             PrintQueue.call(printf, "Buffer not empty, let's send data\n\r");
-            NRF->On();
+            //NRF->On();
             do 
             {
                 char message[32];
                 sealsampleL4_t sample = Buffer->Get(); //get data off buffer
                 sprintf(message, "%4.1f|%2.1f|%s|%d", sample.pressure, sample.temperature, sample.time.c_str(), sample.state); //format message
-                NRF->SendmsgNoPwrCntrl(message); //send message  
+                NRF->Sendmsg(message); //send message  
             }while(!Buffer->IsEmpty()); //repeat until buffer is empty
 
-            NRF->Off();
+            //NRF->Off();
+            
         }
         RestTimer.start();
         if(RestTimer.elapsed_time() >= 60s)
@@ -44,7 +45,7 @@ void SealSubmersion::SurfaceDetection()
             RestTimer.stop();
             RestTimer.reset();
 
-            delay = 30000; //if seal is hauled out then nothing exciting will happen anytime soon, slow down
+            delay = 5000; //if seal is hauled out then nothing exciting will happen anytime soon, slow down
         }else 
         {
             SetSealState(sealstate_t::SURFACE);

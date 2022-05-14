@@ -9,6 +9,7 @@
 #include <string>
 
 #define TRANSFER_SIZE 32
+#define DATARATE NRF24L01P_DATARATE_2_MBPS
 
 extern EventQueue PrintQueue;
 

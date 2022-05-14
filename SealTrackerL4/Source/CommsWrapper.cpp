@@ -18,7 +18,7 @@ void CommsWrapper::InitSendNode()
     PrintQueue.call(printf, "nRF24L01+ TX Address   : 0x%010llX\r\n", Comms.getTxAddress() );
     PrintQueue.call(printf, "nRF24L01+ RX Address   : 0x%010llX\r\n", Comms.getRxAddress() );
     */
-    Comms.setAirDataRate(NRF24L01P_DATARATE_1_MBPS);
+    Comms.setAirDataRate(DATARATE);
     Comms.setTransferSize(32); //maximum message size 
     Comms.setTransmitMode(); 
     Comms.enable(); //go!
@@ -31,7 +31,7 @@ void CommsWrapper::InitSendNode()
 
 void CommsWrapper::InitReceiveNode()
 {
-    Comms.setAirDataRate(NRF24L01P_DATARATE_1_MBPS);
+    Comms.setAirDataRate(DATARATE);
     Comms.setTransferSize(TRANSFER_SIZE); //maximum message size 
     Comms.setReceiveMode(); 
     Comms.enable(); //go!
@@ -44,6 +44,7 @@ void CommsWrapper::Sendmsg(char msg[]) //function for sending one message
     if(strlen(msg) <= 32)
     {
         Comms.powerUp(); //reactivate comms
+        Comms.enable();
         PrintQueue.call(printf, "Sending message:\n\r");
        
         Comms.write( NRF24L01P_PIPE_P0, msg, TRANSFER_SIZE); //send message
@@ -65,6 +66,7 @@ void CommsWrapper::SendmsgNoPwrCntrl(char msg[])
     if(strlen(msg) <= 32)
     {   
         Comms.write( NRF24L01P_PIPE_P0, msg, TRANSFER_SIZE); //send message
+        ThisThread::sleep_for(25ms);
     }
     else
     {
@@ -106,6 +108,7 @@ void CommsWrapper::RequestTime()
 void CommsWrapper::On()
 {
     Comms.powerUp();
+    Comms.enable();
 }
 
 void CommsWrapper::Off()
