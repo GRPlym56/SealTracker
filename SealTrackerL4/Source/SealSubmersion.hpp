@@ -39,6 +39,8 @@ class SealSubmersion
     CommsWrapper* NRF;
     MS5837* Sensor;
 
+    volatile float Pressure;
+    volatile float Temperature;
     volatile float depth[2]; //track previous and current depth
     volatile float delta_depth; //track difference in depth
     volatile float pressure_offset; //ambient pressure value in depth 
