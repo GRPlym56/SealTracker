@@ -12,9 +12,12 @@
 #include "Config.hpp"
 #include "CommsWrapper.hpp"
 #include "SealSubmersion.hpp"
+#include "stm32l4xx.h"
+#include "mbed_error.h"
 
  /*
-    MAKE SURE BUILD PROFILE IN MBED STUDIO IS SET TO DEVELOP    
+    MAKE SURE BUILD PROFILE IN MBED STUDIO IS SET TO DEVELOP  
+    LINE 202 in system_clock.c CONTROLS CLOCK DIVISION  
  */
 
 
@@ -49,8 +52,11 @@ void Dive();
 int main() {
 
     
+    //SystemCoreClockUpdate();
+    
 
     PrintThread.start(Printer); //should start before every other thread
+    PrintQueue.call(printf, "SystemCoreClock = %d MHz\r\n", SystemCoreClock/1000000); //display system core clock
     
     microSD.Test();
     NRF.InitSendNode();

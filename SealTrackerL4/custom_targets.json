@@ -2,6 +2,9 @@
     "CUSTOM_L432KC": {
             "inherits": ["NUCLEO_L432KC"],
             "components": ["SD"],
-            "features_add": ["STORAGE"]
+            "features_add": ["STORAGE"],
+			"clock_source": "USE_PLL_HSI",
+			"lse_available": 0
+		
         }
 }
