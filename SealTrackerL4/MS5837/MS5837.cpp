@@ -1,13 +1,13 @@
 #include <stdlib.h>
 #include "MS5837.h"
 
-
 /*
  * Sensor operating function according data sheet
  */
 
 void MS5837::MS5837Init(void)
 {
+    
     MS5837Reset();
     MS5837ReadProm();
     return;
@@ -19,13 +19,14 @@ void MS5837::MS5837Reset(void)
     /* transmit out 1 byte reset command */
     ms5837_tx_data[0] = ms5837_reset;
     if ( i2c.write( device_address,  ms5837_tx_data, 1 ) );
-    printf("send soft reset\n");
+    PrintQueue.call(printf, "send soft reset\n");
     ThisThread::sleep_for(20ms);
+
 }
 
 /* read the sensor calibration data from rom */
 void MS5837::MS5837ReadProm(void)
-{
+{ 
     uint8_t i,j;
     for (i=0; i<8; i++) {
         j = i;
@@ -34,6 +35,7 @@ void MS5837::MS5837ReadProm(void)
         if ( i2c.read( device_address,  ms5837_rx_data, 2 ) );
         C[i]   = ms5837_rx_data[1] + (ms5837_rx_data[0]<<8);
     }
+   
 }
 
 /* Start the sensor pressure conversion */
@@ -44,7 +46,7 @@ void MS5837::MS5837ConvertD1(void)
 }
 
 /* Start the sensor temperature conversion */
-void MS5837:: MS5837ConvertD2(void)
+void MS5837::MS5837ConvertD2(void)
 {
     ms5837_tx_data[0] = ms5837_convD2;
     if ( i2c.write( device_address,  ms5837_tx_data, 1 ) );
@@ -66,40 +68,62 @@ int32_t MS5837::MS5837ReadADC(void)
 /* return the results */
 float MS5837::MS5837_Pressure (void)
 {
-    return P_MS5837;
+    if(SensorLock.trylock_for(5s))
+    {
+        float Pressure = P_MS5837;
+        SensorLock.unlock();
+        return Pressure; //return copy as lock must be released, which would have left P_MS5837 open to corruption
+    }else 
+    {
+        PrintQueue.call(printf, "Sensorlock trylock failed in get Pressure\n\r");
+        return 0.0f;
+    }
 }
 float MS5837::MS5837_Temperature (void)
 {
-    return T_MS5837;
+    if(SensorLock.trylock_for(5s))
+    {
+        float temperature = T_MS5837;
+        SensorLock.unlock();
+        return temperature; //return copy as lock must be released, which would have left T_MS5837 open to corruption
+    }else 
+    {
+        PrintQueue.call(printf, "Sensorlock trylock failed in get Temperature\n\r");
+        return 0.0f;
+    }
 }
 
 /* Sensor reading and calculation procedure */
 void MS5837::Barometer_MS5837(void)
 {
-    int32_t dT, temp;
-    int64_t OFF, SENS, press;
+    if(SensorLock.trylock_for(5s))
+    {
+        int32_t dT, temp;
+        int64_t OFF, SENS, press;
+         
+        MS5837ConvertD1();             // start pressure conversion
+        D1 = MS5837ReadADC();        // read the pressure value
+        MS5837ConvertD2();             // start temperature conversion
+        D2 = MS5837ReadADC();         // read the temperature value
+        //printf("D1 = %d\n", D1);
+        /* calculation according MS5837-01BA data sheet DA5837-01BA_006 */
+        dT       = D2 - (C[5]* 256);
+        OFF      = (int64_t)C[2] * (1<<16) + ((int64_t)dT * (int64_t)C[4]) / (1<<7);
+        SENS     = (int64_t)C[1] * (1<<15) + ((int64_t)dT * (int64_t)C[3]) / (1<<8);
 
-    //no need to do this everytime!
-    
-    
-    MS5837ConvertD1();             // start pressure conversion
-    D1 = MS5837ReadADC();        // read the pressure value
-    MS5837ConvertD2();             // start temperature conversion
-    D2 = MS5837ReadADC();         // read the temperature value
-    //printf("D1 = %d\n", D1);
-    /* calculation according MS5837-01BA data sheet DA5837-01BA_006 */
-    dT       = D2 - (C[5]* 256);
-    OFF      = (int64_t)C[2] * (1<<16) + ((int64_t)dT * (int64_t)C[4]) / (1<<7);
-    SENS     = (int64_t)C[1] * (1<<15) + ((int64_t)dT * (int64_t)C[3]) / (1<<8);
-
-    temp     = 2000 + (dT * C[6]) / (1<<23);
-    T_MS5837 = (float) temp / 100.0f;                 // result of temperature in deg C in this var
-    press    = (((int64_t)D1 * SENS) / (1<<21) - OFF) / (1<<13);
-    P_MS5837 = (float) press / 10.0f;                 // result of pressure in mBar in this var
-    
-    if (P_MS5837 < 900 || P_MS5837 > 30000) {
-        MS5837Reset();                 // reset the sensor
-        MS5837ReadProm();             // read the calibration values
+        temp     = 2000 + (dT * C[6]) / (1<<23);
+        T_MS5837 = (float) temp / 100.0f;                 // result of temperature in deg C in this var
+        press    = (((int64_t)D1 * SENS) / (1<<21) - OFF) / (1<<13);
+        P_MS5837 = (float) press / 10.0f;                 // result of pressure in mBar in this var
+        
+        if (P_MS5837 < 900 || P_MS5837 > 30000) {
+            MS5837Reset();                 // reset the sensor
+            MS5837ReadProm();             // read the calibration values
+        }
+        SensorLock.unlock();
+    }else 
+    {
+        PrintQueue.call(printf, "Sensorlock trlock failed in barometer\n\r");
     }
 }
 
