@@ -32,8 +32,6 @@
 #define ms5837_ADCread     0x00 // read ADC command
 #define ms5837_PROMread    0xA0 // read PROM command base address
 
-extern EventQueue PrintQueue;
-
 class MS5837{
 private:
     int D1, D2, Temp, C[8];
@@ -59,9 +57,6 @@ public:
     float depth(void);
 
 private:
-
-    Mutex SensorLock;
-
     I2C     i2c;
     char    device_address;
 
