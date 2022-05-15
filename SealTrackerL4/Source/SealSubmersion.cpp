@@ -25,39 +25,16 @@ void SealSubmersion::SurfaceDetection()
     {
         if(!Buffer->IsEmpty()){ //check if buffer is empty before turning comms on
             PrintQueue.call(printf, "Buffer not empty, let's send data\n\r");
-            char message[32];
-            
-            switch(SEAL_STATE)
+            //NRF->On();
+            do 
             {
-                case sealstate_t::RESTING: //seal is resting, send all buffered samples
-                    
-                    do 
-                    {
-                        sealsampleL4_t sample = Buffer->Get(); //get data off buffer
-                        sprintf(message, "%4.1f|%2.1f|%s|%d", sample.pressure, sample.temperature, sample.time.c_str(), sample.state); //format message
-                        NRF->Sendmsg(message); //send message  
-                    }while(!Buffer->IsEmpty()); //repeat until buffer is empty
-                   
-                    break;
+                char message[32];
+                sealsampleL4_t sample = Buffer->Get(); //get data off buffer
+                sprintf(message, "%4.1f|%2.1f|%s|%d", sample.pressure, sample.temperature, sample.time.c_str(), sample.state); //format message
+                NRF->Sendmsg(message); //send message  
+            }while(!Buffer->IsEmpty()); //repeat until buffer is empty
 
-                default: //seal has just surfaced, only send a moderate amount of samples
-                    
-                    for(int i = 0; i<20; i++)
-                    {
-                        if(!Buffer->IsEmpty()) //make sure buffer still has samples to send before proceeding
-                        {
-                            sealsampleL4_t sample = Buffer->Get(); //get data off buffer
-                            sprintf(message, "%4.1f|%2.1f|%s|%d", sample.pressure, sample.temperature, sample.time.c_str(), sample.state); //format message
-                            NRF->Sendmsg(message); //send message  
-                        }else {
-                            break;
-                        }
-                    }
-                    
-                    break;
-
-            }
-            
+            //NRF->Off();
             
         }
         RestTimer.start();
@@ -109,8 +86,8 @@ void SealSubmersion::UpdateDepth() //measures current pressure value and updates
     
 
     Sensor->Barometer_MS5837(); //update values
-    Pressure = Sensor->MS5837_Pressure(); //get pressure value from sensor class
-    Temperature = Sensor->MS5837_Temperature(); //get temperature value from sensor class
+    volatile float Pressure = Sensor->MS5837_Pressure(); //get pressure value from sensor class
+    
     
     depth[NOW] = (Pressure - pressure_offset)/100.52; //remove ambient surface pressure, divide by 100.52 to get depth in metres
     PrintQueue.call(printf, "Depth: %f \n\r", depth[NOW]);
@@ -146,23 +123,11 @@ sealstate_t SealSubmersion::GetSealState() //returns current state of seal
 
 }
 
-void SealSubmersion::SetSealState(sealstate_t newstate) //update state and put latest sample into dive buffer when seal state changes
+void SealSubmersion::SetSealState(sealstate_t newstate)
 {
     if(BlubberLock.trylock_for(5s))
     {
-        SEAL_STATE = newstate; //set member variable that main sampler thread can get
-
-        sealsampleL4_t DiveSample; //new dive sample to go on characteristic dive buffer
-        char timesample[32];
-        time_t seconds = time(NULL); //get current time from the rtc
-        SEAL_STATE = newstate; //set member variable that main sampler thread can get
-        DiveSample.pressure = Pressure;
-        DiveSample.temperature = Temperature;
-        strftime(timesample, 32, "%b:%d:(%H:%M)", localtime(&seconds));
-        DiveSample.time = timesample;
-        DiveSample.state = newstate;
-        Buffer->Put(DiveSample);
-
+        SEAL_STATE = newstate;
         BlubberLock.unlock();
     }
     else

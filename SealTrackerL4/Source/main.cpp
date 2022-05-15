@@ -108,7 +108,7 @@ void UpdateSamplers()
         time_t seconds = time(NULL); //get current time from the rtc
         PressSens.Barometer_MS5837(); //get latest temperature and pressure values
         
-        //ThisThread::sleep_for(5ms); //give time for the conversion to finish
+        ThisThread::sleep_for(5ms); //give time for the conversion to finish
         sample.pressure = PressSens.MS5837_Pressure(); 
         sample.temperature = PressSens.MS5837_Temperature();
 
@@ -118,7 +118,7 @@ void UpdateSamplers()
         sample.time = timesample;
         sample.state = DiveTracker.GetSealState();
         MainSDBuffer.Put(sample); //put new sample on buffer
-        //ChrDiveBuff.Put(sample);
+        ChrDiveBuff.Put(sample);
         /*
         count++;
         if(count >= 3)
@@ -128,7 +128,7 @@ void UpdateSamplers()
         }
         */
        
-        ThisThread::sleep_for(15s);
+        ThisThread::sleep_for(10s);
     }
 }
 
