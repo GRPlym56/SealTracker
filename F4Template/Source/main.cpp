@@ -8,20 +8,19 @@
 #include <ratio>
 
 
-
-
 EventQueue PrintQueue;
 CircBuff SDBuffer(256, "SDBuff");
 CircBuff NetBuffer(256, "NetBuff");
 
 SDCARD microSD(SDpins, &SDBuffer);
 Azure Net(&NetBuffer);
-CommsWrapper RFModule(RFPINS, PB_7, &SDBuffer, &NetBuffer);
+CommsWrapper RFModule(RFPINS, PB_7, &SDBuffer, &NetBuffer, ButtonPins);
 
 Thread RFThread;
 Thread PrintThread;
 Thread AzureThread;
 
+void SW1Interrupt();
 void ReceiveData();
 void Printer();
 void Networking();
@@ -29,16 +28,17 @@ void Networking();
 
 int main() {
 
-    //startup section, attempt to send time to L432kc
     PrintThread.start(Printer);
   
-    
-
+ 
     RFModule.WaitForRequest(); //wait for the L432 to request time
+
+    
 
     RFModule.InitReceiveNode();
     
     RFThread.start(ReceiveData);
+    
     //RFThread.set_priority(osPriorityAboveNormal);
     
     AzureThread.start(Networking);

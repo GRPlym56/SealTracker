@@ -151,6 +151,7 @@ void SealSubmersion::SetSealState(sealstate_t newstate) //update state and put l
     if(BlubberLock.trylock_for(5s))
     {
         SEAL_STATE = newstate; //set member variable that main sampler thread can get
+        PrintQueue.call(printf, "Seal state: %d\n\r", SEAL_STATE);
 
         sealsampleL4_t DiveSample; //new dive sample to go on characteristic dive buffer
         char timesample[32];

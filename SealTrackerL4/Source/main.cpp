@@ -21,19 +21,17 @@
  */
 
 
-#define SampleFlag 1
-
 
 EventQueue PrintQueue;
 
 CommsWrapper NRF(RFPINS);
-CircBuff MainSDBuffer(512, "MainSDBuff"); //main buffer for getting samples to the SD card
+CircBuff MainSDBuffer(100, "MainSDBuff"); //main buffer for getting samples to the SD card
 SDCARD microSD(SDpins, &MainSDBuffer);
 
 MS5837 PressSens(PA_10, PA_9); //SDA, SCL
 
 
-CircBuff ChrDiveBuff(512, "ChrDiveBuff"); //secondary buffer for live readout of data characterising general dive behaviour on azure
+CircBuff ChrDiveBuff(100, "ChrDiveBuff"); //secondary buffer for live readout of data characterising general dive behaviour on azure
 SealSubmersion DiveTracker(&ChrDiveBuff, &NRF, &PressSens); 
 
 
@@ -134,7 +132,7 @@ void UpdateSamplers()
         }
         */
        
-        ThisThread::sleep_for(15s);
+        ThisThread::sleep_for(5s);
     }
 }
 

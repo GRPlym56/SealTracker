@@ -12,12 +12,13 @@
 #define DATARATE NRF24L01P_DATARATE_2_MBPS
 
 extern EventQueue PrintQueue;
+extern bool skipsetup;
 
 class CommsWrapper
 {
     public:
 
-    CommsWrapper(NRFPINS pins, DigitalOut CommsLED, CircBuff* SD, CircBuff* Net);
+    CommsWrapper(NRFPINS pins, DigitalOut CommsLED, CircBuff* SD, CircBuff* Net, ButtonConfig_t BPins);
     void Sendmsg(char msg[]);
     void ReceiveData();
     void InitSendNode();
@@ -41,6 +42,8 @@ class CommsWrapper
     CircBuff* netbuff;
     
     osThreadId_t AzureThread;
+
+   DigitalIn SW1;
     
     
     

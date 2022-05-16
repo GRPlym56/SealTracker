@@ -9,6 +9,7 @@ December-January 2022
 #include <iostream>
 #include <string>
 
+
 #define AzureFlag (1UL << 1) //flag for azure to wait on
 
 enum class sealstate_t
@@ -40,6 +41,17 @@ const SPIConfig_t SDpins{
     PF_3
 };
 
+typedef struct 
+{
+    PinName Pin;
+    PinMode Mode;
+} ButtonConfig_t; 
+
+const ButtonConfig_t ButtonPins
+{
+    PG_0,
+    PullUp
+};
 
 typedef struct 
 {

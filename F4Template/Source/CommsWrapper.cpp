@@ -1,6 +1,7 @@
 #include "CommsWrapper.hpp"
 
-CommsWrapper::CommsWrapper(NRFPINS Pins, DigitalOut CommsLED, CircBuff* SD, CircBuff* Net): Comms(Pins.mosi, Pins.miso, Pins.sck, Pins.csn, Pins.ce, Pins.irq), LED(CommsLED), sdbuff(SD), netbuff(Net) 
+CommsWrapper::CommsWrapper(NRFPINS Pins, DigitalOut CommsLED, CircBuff* SD, CircBuff* Net, ButtonConfig_t BPins): 
+Comms(Pins.mosi, Pins.miso, Pins.sck, Pins.csn, Pins.ce, Pins.irq), LED(CommsLED), sdbuff(SD), netbuff(Net), SW1(BPins.Pin, BPins.Mode) 
 {
     //init sequence
     Comms.powerUp();
@@ -169,8 +170,8 @@ void CommsWrapper::WaitForRequest()
             }
            
             
-
+            
         }
 
-    }while(done == false);
+    }while(!done && !SW1.read());
 }
