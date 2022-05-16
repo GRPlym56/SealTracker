@@ -59,11 +59,10 @@ public:
     float depth(void);
 
 private:
-
-    Mutex SensorLock;
-
     I2C     i2c;
     char    device_address;
+
+    Mutex SensorLock;
 
 };
 #endif

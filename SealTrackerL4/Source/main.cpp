@@ -5,7 +5,7 @@
 #include "mbed.h"
 #include "platform/mbed_thread.h"
 #include "nRF24L01P.h"
-#include "../MS5837/MS5837.h"
+#include "MS5837.h"
 #include "string.h"
 #include "SDWrapper.hpp"
 #include "CBUFF.hpp"
