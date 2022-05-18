@@ -17,7 +17,7 @@
 
  /*
     MAKE SURE BUILD PROFILE IN MBED STUDIO IS SET TO DEVELOP  
-    LINE 202 in system_clock.c CONTROLS CLOCK DIVISION  
+    system_clock.c CONTROLS CLOCK DIVISION  
  */
 
 
@@ -50,11 +50,13 @@ void Dive();
 int main() {
 
     
-    //SystemCoreClockUpdate();
+    SystemCoreClockUpdate();
     
 
     PrintThread.start(Printer); //should start before every other thread
     PrintQueue.call(printf, "SystemCoreClock = %d MHz\r\n", SystemCoreClock/1000000); //display system core clock
+    PressSens.MS5837Init();
+    DiveTracker.GetAmbientDepth();
     
     microSD.Test();
     NRF.InitSendNode();
@@ -63,8 +65,8 @@ int main() {
 
     NRF.InitSendNode(); //reinit send mode
 
-    PressSens.MS5837Init();
-    DiveTracker.GetAmbientDepth();
+    
+   
 
     //test loop
    
@@ -117,7 +119,7 @@ void UpdateSamplers()
         sample.temperature = PressSens.MS5837_Temperature();
 
         PrintQueue.call(printf, "P:%f, T:%f\n\r", sample.pressure, sample.temperature);
-        strftime(timesample, 32, "%b:%d:(%H:%M)", localtime(&seconds));
+        strftime(timesample, 32, "%m:%d:%H:%M", localtime(&seconds));
         PrintQueue.call(printf, "Time: %s\n\r", timesample);
         sample.time = timesample;
         sample.state = DiveTracker.GetSealState();

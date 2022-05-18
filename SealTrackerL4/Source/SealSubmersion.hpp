@@ -45,7 +45,7 @@ class SealSubmersion
     volatile float delta_depth; //track difference in depth
     volatile float pressure_offset; //ambient pressure value in depth 
 
-    unsigned int delay = 5000; //default delay 5000ms
+    int delay = 5000; //default delay 5000ms
 
     LowPowerTimer RestTimer; //low power ;)
     

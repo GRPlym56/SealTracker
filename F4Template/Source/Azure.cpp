@@ -127,7 +127,7 @@ void Azure::SendData() {
     // Send ten message to the cloud (one per second)
     // or until we receive a message from the cloud
     IOTHUB_MESSAGE_HANDLE message_handle;
-    char message[80];
+    char message[100];
 
     /*
         MAKE THIS WAIT ON A SIGNAL INSTEAD OF JUST POLLING AS THAT PROBABLY ISNT A VERY GOOD WAY OF DOING IT
@@ -163,7 +163,7 @@ void Azure::SendData() {
             
             sealsample_t outputData = NetBuffer->Get(); //get samples from buffer 
             
-            sprintf(message, "{ \"Pressure\" : %f, \"Temperature\" : %f, \"Time\" : \"%s\" }", stof(outputData.pressure.c_str()), stof(outputData.temperature.c_str()), outputData.time.c_str());
+            sprintf(message, "{ \"Pressure\" : %f, \"Temperature\" : %f, \"Time\" : \"%s\", \"SealState\" : %d }", stof(outputData.pressure.c_str()), stof(outputData.temperature.c_str()), outputData.time.c_str(), stoi(outputData.state.c_str()));
             LogInfo("Sending: \"%s\"", message);
 
             message_handle = IoTHubMessage_CreateFromString(message);

@@ -21,7 +21,7 @@ void SealSubmersion::SurfaceDetection()
 
     UpdateDepth(); //measure depth in metres and produce a delta
 
-    if(depth[NOW] < 1000.0f) 
+    if(depth[NOW] < 0.05f) //2.5cm
     {
         if(!Buffer->IsEmpty()){ //check if buffer is empty before turning comms on
             PrintQueue.call(printf, "Buffer not empty, let's send data\n\r");
@@ -34,7 +34,7 @@ void SealSubmersion::SurfaceDetection()
                     do 
                     {
                         sealsampleL4_t sample = Buffer->Get(); //get data off buffer
-                        sprintf(message, "%4.1f|%2.1f|%s|%d", sample.pressure, sample.temperature, sample.time.c_str(), sample.state); //format message
+                        sprintf(message, "%4.1f|%2.1f|%s|%d|", sample.pressure, sample.temperature, sample.time.c_str(), sample.state); //format message
                         NRF->Sendmsg(message); //send message  
                     }while(!Buffer->IsEmpty()); //repeat until buffer is empty
                    
@@ -47,7 +47,7 @@ void SealSubmersion::SurfaceDetection()
                         if(!Buffer->IsEmpty()) //make sure buffer still has samples to send before proceeding
                         {
                             sealsampleL4_t sample = Buffer->Get(); //get data off buffer
-                            sprintf(message, "%4.1f|%2.1f|%s|%d", sample.pressure, sample.temperature, sample.time.c_str(), sample.state); //format message
+                            sprintf(message, "%4.1f|%2.1f|%s|%d|", sample.pressure, sample.temperature, sample.time.c_str(), sample.state); //format message
                             NRF->Sendmsg(message); //send message  
                         }else {
                             break;
@@ -75,7 +75,7 @@ void SealSubmersion::SurfaceDetection()
         }
         
             
-    }else if(delta_depth > 1 ) //seal diving?
+    }else if(delta_depth > 0.05f ) //seal diving?
     {
         RestTimer.stop();
         RestTimer.reset();
@@ -83,7 +83,7 @@ void SealSubmersion::SurfaceDetection()
         
         delay = 5000; //moderate day to keep track of the dive
         
-    }else if(delta_depth < 1) //seal ascending?
+    }else if(delta_depth < -0.025f) //seal ascending?
     {
         RestTimer.stop();
         RestTimer.reset();
@@ -96,7 +96,7 @@ void SealSubmersion::SurfaceDetection()
         RestTimer.stop();
         RestTimer.reset();
         SetSealState(sealstate_t::CRUISING);
-        delay = ((unsigned int)depth*3000)/10; //larger delay the deeper the seal is (example: 100m depth = (100*3)/10 = 30s delay)
+        delay = (depth[NOW]*3000)/10; //the deeper the seal, the longer the delay is (example: 100m depth = (100*3000)/10 = 30000ms delay)
     }
 
     ThisThread::sleep_for(delay);
@@ -124,8 +124,16 @@ void SealSubmersion::UpdateDepth() //measures current pressure value and updates
 void SealSubmersion::GetAmbientDepth() //convert ambient pressure value to depth to calibrate depth tracking
 {
 
-    Sensor->Barometer_MS5837();
-    pressure_offset = Sensor->MS5837_Pressure();
+    float Pressure;
+    for(unsigned short i = 0; i<10; i++)
+    {
+        Sensor->Barometer_MS5837();
+        Pressure += Sensor->MS5837_Pressure(); //sum of measurements
+        ThisThread::sleep_for(100ms); //generous timing slack
+    }
+
+    pressure_offset = Pressure/10; //average 
+    
     PrintQueue.call(printf, "Ambient pressure: %4.2f \n\r", pressure_offset);
     
 }
@@ -159,7 +167,7 @@ void SealSubmersion::SetSealState(sealstate_t newstate) //update state and put l
         SEAL_STATE = newstate; //set member variable that main sampler thread can get
         DiveSample.pressure = Pressure;
         DiveSample.temperature = Temperature;
-        strftime(timesample, 32, "%b:%d:(%H:%M)", localtime(&seconds));
+        strftime(timesample, 32, "%b:%d:%H:%M", localtime(&seconds));
         DiveSample.time = timesample;
         DiveSample.state = newstate;
         Buffer->Put(DiveSample);

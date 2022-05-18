@@ -1,4 +1,4 @@
-#ifndef __SDWRAPPER_HPP __
+#ifndef __SDWRAPPER_HPP__
 #define __SDWRAPPER_HPP__
 
 #include "mbed.h"
