@@ -35,7 +35,7 @@ CircBuff ChrDiveBuff(100, "ChrDiveBuff"); //secondary buffer for live readout of
 SealSubmersion DiveTracker(&ChrDiveBuff, &NRF, &PressSens); 
 
 
-Thread PrintThread, SDThread, SamplerThread, DiveThread;
+Thread PrintThread, SamplerThread, DiveThread;
 //Thread PrintThread(osPriorityNormal, OS_STACK_SIZE, nullptr, "Print Thread");
 
 
@@ -106,7 +106,7 @@ int main() {
 
 void UpdateSamplers()
 {
-    volatile unsigned int count = 0;
+    
     while(1)
     {  
         sealsampleL4_t sample;
@@ -124,16 +124,7 @@ void UpdateSamplers()
         sample.time = timesample;
         sample.state = DiveTracker.GetSealState();
         MainSDBuffer.Put(sample); //put new sample on buffer
-        //ChrDiveBuff.Put(sample);
-        /*
-        count++;
-        if(count >= 3)
-        {
-            ChrDiveBuff.Put(sample); //update dive characteristic buffer
-            count = 0;
-        }
-        */
-       
+        
         ThisThread::sleep_for(5s);
     }
 }
