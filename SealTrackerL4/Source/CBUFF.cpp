@@ -100,16 +100,16 @@ sealsampleL4_t CircBuff::Peek()
     return returnsample;
 }
 
-bool CircBuff::FullCheck(void) //private function, no mutex
+bool CircBuff::FullCheck(void) //private function, no mutex since I control when it happens
 {
     if(currentsize == max_size)
     {
         PrintQueue.call(printf, "%s buffer full\n\r", name);
-        return 1; //buffer full
+        return 1; //buffer full, return true
         
     }else 
     {
-        return 0; //buffer not full
+        return 0; //buffer not full, return false
     }
     
 }
@@ -177,15 +177,17 @@ void CircBuff::IncrementTail(void) //private function, no mutex
     
 }
 
-unsigned int CircBuff::GetSize(void) //
+unsigned int CircBuff::GetSize(void) //get buffer size
 {
+    
     if(Bufferlock.trylock_for(5s))
     {
+        unsigned int Size = currentsize; //make a copy so lock can be released
         Bufferlock.unlock();
-        return currentsize;
+        return Size;
     }else 
     {
-        PrintQueue.call(printf, "%s Fault: 'GetSzie' trylock failed\n\r", name);
+        PrintQueue.call(printf, "%s Fault: 'GetSize' trylock failed\n\r", name);
         return 0;
     }
 }

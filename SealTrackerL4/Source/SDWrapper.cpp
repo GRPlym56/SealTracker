@@ -2,25 +2,14 @@
 
 SDCARD::SDCARD(SPIConfig_t pins, CircBuff* SDBuff): SD(SDpins.MOSI, SDpins.MISO, SDpins.SCLK, SDpins.CS), fs("sd", &SD), SDBuffer(SDBuff)
 {
-
-    //FATFileSystem fs("sd", &SD);
-
-    //write some information at the top of the files
-    
    
     int err;
     err = SD.init();
     if ( 0 != err) {
         PrintQueue.call(printf, "Init failed %d\n",err);
-        //return -1;
     }
     
     PrintQueue.call(printf, "%s\n", fileName);
-    //PrintQueue.call(printf, "%s\n", fileName1);
-    /*
-    fp = fopen(fileName,"w");
-    ft = fopen(fileName1, "w");
-    */
     
     samplefile = fopen(fileName, "w");
 
@@ -31,11 +20,8 @@ SDCARD::SDCARD(SPIConfig_t pins, CircBuff* SDBuff): SD(SDpins.MOSI, SDpins.MISO,
     }else
     {
     
-        //PrintQueue.call(printf, "Write to SD: %s, %s\n\r", output.pressure.c_str(), output.temperature.c_str()); //write each n byte line
-        fprintf(samplefile, "Pressure mbar ,Temperature C, Time\n"); 
-        
-        //SDLock.unlock();
-        //Tidy up here
+        fprintf(samplefile, "Pressure mbar ,Temperature C, Time, State\n"); 
+         
         fclose(samplefile);
         PrintQueue.call(printf, "SD Write done...\n");
         SD.deinit();
@@ -70,7 +56,7 @@ void SDCARD::Test(void)
     
 }
 
-int SDCARD::flush() //flush all samples from buffer to 
+int SDCARD::flush() //flush all samples from buffer to SD
 {
 
         PrintQueue.call(printf, "Flushing to SD\n");
