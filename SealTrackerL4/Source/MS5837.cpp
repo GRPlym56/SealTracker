@@ -115,7 +115,7 @@ void MS5837::Barometer_MS5837(void)
         press    = (((int64_t)D1 * SENS) / (1<<21) - OFF) / (1<<13);
         P_MS5837 = (float) press / 10.0f;                 // result of pressure in mBar in this var
         
-        if (P_MS5837 < 900 || P_MS5837 > 3000) {
+        if (P_MS5837 < 900 || P_MS5837 > 30000) {
             MS5837Reset();                 // reset the sensor
             MS5837ReadProm();             // read the calibration values
         }

@@ -33,7 +33,7 @@ class SealSubmersion
 
     private:
 
-    Mutex BlubberLock;
+    Mutex BlubberLock; //seals are blubbery
 
     CircBuff* Buffer;
     CommsWrapper* NRF;
