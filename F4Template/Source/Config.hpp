@@ -58,7 +58,7 @@ typedef struct
     float pressure;
     float temperature;
     std::string time;
-    std::string state;
+    unsigned int state;
 
 } sealsample_t;
 

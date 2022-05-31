@@ -109,11 +109,11 @@ void CommsWrapper::Decode()
         count++;
         s.erase(0, pos + delimiter.length());
     }
-    //put newly acquired date on appropriate buffers
+    //format and put newly acquired date on appropriate buffers
     newsample.pressure = stof(token[0]);
     newsample.temperature = stof(token[1]);
     newsample.time = token[2];
-    newsample.state = token[3];
+    newsample.state = stoi(token[3]);
 
     sdbuff->Put(newsample); 
     netbuff->Put(newsample);
