@@ -110,8 +110,8 @@ void CommsWrapper::Decode()
         s.erase(0, pos + delimiter.length());
     }
     //put newly acquired date on appropriate buffers
-    newsample.pressure = token[0];
-    newsample.temperature = token[1];
+    newsample.pressure = stof(token[0]);
+    newsample.temperature = stof(token[1]);
     newsample.time = token[2];
     newsample.state = token[3];
 
@@ -173,5 +173,5 @@ void CommsWrapper::WaitForRequest()
             
         }
 
-    }while(!done && !SW1.read());
+    }while(!done && !SW1.read()); //allow setup to be skipped if the L432 RTC is already configured
 }

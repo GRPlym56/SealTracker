@@ -120,7 +120,7 @@ bool CircBuff::FullCheck(void)
     
 }
 
-bool CircBuff::EmptyCheck(void)
+bool CircBuff::EmptyCheck(void) //private function, no mutex
 {
    
     if(currentsize == 0)
