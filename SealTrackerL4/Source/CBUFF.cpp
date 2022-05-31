@@ -5,7 +5,7 @@ CircBuff::CircBuff(unsigned int buffsize, char * buffername): max_size(buffsize)
 {
 
     Buffer = new sealsampleL4_t [buffsize]; //allocate some memory for the new buffer
-    PrintQueue.call(printf, "New buffer %s, Size: %d\n\r", name, buffsize);
+    PrintQueue.call(printf, "New buffer %s, Size: %d\n\r", name, buffsize); //declare buffer creation
 
 
 }
@@ -17,27 +17,27 @@ void CircBuff::Put(sealsampleL4_t newsample)
     //put a sample onto the buffer
     if(Bufferlock.trylock_for(10s))
     {
-        if(FullCheck())
+        if(FullCheck()) //check fullness
         {
             //buffer is full, overwrite oldest sample and update tail to represent next oldest sample
-            IncrementTail();
-            Buffer[head] = newsample;
-            IncrementHead();
-            //no need to change current size as buffer is full
+            IncrementTail(); //increment tail accordingly
+            Buffer[head] = newsample; //put new sample onto the buffer
+            IncrementHead(); //increment head accordingly
+            //no need to change current size as buffer is still full
 
         }else 
         {
-            Buffer[head] = newsample;
-            IncrementHead();
-            currentsize++;
+            Buffer[head] = newsample; //put new sample onto the buffer
+            IncrementHead(); //increment head accordingly
+            currentsize++; //increase size count
             
         }
         
-        PrintQueue.call(printf, "%s Buffer Put: Size: %d, Head: %d, Tail: %d\n\r", name, currentsize, head, tail);
-        Bufferlock.unlock();
+        PrintQueue.call(printf, "%s Buffer Put: Size: %d, Head: %d, Tail: %d\n\r", name, currentsize, head, tail); //report buffer status
+        Bufferlock.unlock(); //release lock
     }else 
     {
-        PrintQueue.call(printf, "%s Fault: 'Put' trylock failed\n\r", name);
+        PrintQueue.call(printf, "%s Fault: 'Put' trylock failed\n\r", name); //report problem
     }
     
 
@@ -52,26 +52,26 @@ sealsampleL4_t CircBuff::Get() //return a sample from the buffer and increment t
     {
         if(EmptyCheck()) //check if buffer is empty
         {
-            //do nothing, buffer is empty
+            //nothing to do, buffer is empty
 
         }else
         {
             //buffer isnt empty, return sample
-            returnsample = Buffer[tail];
-            IncrementTail();
-            currentsize--; //decrement size counter
+            returnsample = Buffer[tail]; //copy sample
+            IncrementTail(); //increment tail position now that section of memory is 'free'
+            currentsize--; //decrement size counter accordingly
             
         }
         
 
 
-        PrintQueue.call(printf, "%s Buffer Get: Size: %d, Head: %d, Tail: %d\n\r", name, currentsize, head, tail);
-        Bufferlock.unlock();
+        PrintQueue.call(printf, "%s Buffer Get: Size: %d, Head: %d, Tail: %d\n\r", name, currentsize, head, tail); //report buffer status
+        Bufferlock.unlock(); //release lock
     }else 
     {
-        PrintQueue.call(printf, "%s Fault: 'Get' trylock failed\n\r", name);
+        PrintQueue.call(printf, "%s Fault: 'Get' trylock failed\n\r", name); //report problem
     }
-    return returnsample;
+    return returnsample; //return result
 }
 
 sealsampleL4_t CircBuff::Peek()
@@ -155,7 +155,7 @@ bool CircBuff::IsEmpty(void) //public version with mutex since it can happen any
 
 void CircBuff::IncrementHead(void) //private function, no mutex
 {
-    if(head == max_index) //returns 1 if pointer wraps around
+    if(head == max_index) 
     {
         head = 0; //however we want the start of the buffer, 0 not 1
     }else  
@@ -167,7 +167,7 @@ void CircBuff::IncrementHead(void) //private function, no mutex
 
 void CircBuff::IncrementTail(void) //private function, no mutex
 {
-    if(tail == max_index) //returns 1 if pointer wraps around
+    if(tail == max_index) 
     {
         tail = 0; //however we want the start of the buffer, 0 not 1
     }else  
@@ -183,11 +183,11 @@ unsigned int CircBuff::GetSize(void) //get buffer size
     if(Bufferlock.trylock_for(5s))
     {
         unsigned int Size = currentsize; //make a copy so lock can be released
-        Bufferlock.unlock();
-        return Size;
+        Bufferlock.unlock(); //release lock
+        return Size; //return count
     }else 
     {
-        PrintQueue.call(printf, "%s Fault: 'GetSize' trylock failed\n\r", name);
+        PrintQueue.call(printf, "%s Fault: 'GetSize' trylock failed\n\r", name); //report problem
         return 0;
     }
 }

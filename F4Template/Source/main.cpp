@@ -20,7 +20,7 @@ Thread RFThread;
 Thread PrintThread;
 Thread AzureThread;
 
-void SW1Interrupt();
+
 void ReceiveData();
 void Printer();
 void Networking();

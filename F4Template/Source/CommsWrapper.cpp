@@ -158,8 +158,8 @@ void CommsWrapper::WaitForRequest()
                 time_t seconds = time(NULL);
                 char EpochTime[32];
                 sprintf(EpochTime, "%d", seconds); //convert time to char array for sending
-                ThisThread::sleep_for(1s); //give the L432 time to switch to receive mode
-                for(int i = 0; i<3; i++)
+                ThisThread::sleep_for(1s); //give the L432 a generous amount of time to switch to receive mode
+                for(int i = 0; i<3; i++) //send three times to ensure that it is received
                 {
                     Sendmsg(EpochTime);
                 }

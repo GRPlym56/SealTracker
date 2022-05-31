@@ -120,7 +120,7 @@ int SDCARD::flush() //flush all samples from buffer to
             fprintf(ft, "%s\n", output.temperature.c_str());
             */
             
-            fprintf(samplefile, "%f,%f,%s,%s\n", output.pressure, output.temperature, output.time.c_str(), output.state.c_str());
+            fprintf(samplefile, "%f,%f,%s,%d\n", output.pressure, output.temperature, output.time.c_str(), output.state);
             
         }
         //SDLock.unlock();

@@ -16,9 +16,9 @@ class CircBuff
         CircBuff(unsigned int buffsize, char * buffername);
    
         //public functions protected by Bufferlock
-        void Put(sealsampleL4_t newsample);
-        sealsampleL4_t Get(void);
-        sealsampleL4_t Peek(void);
+        void Put(sealsampleL4_t newsample); //put new sample onto buffer
+        sealsampleL4_t Get(void); //get oldest sample off buffer
+        sealsampleL4_t Peek(void); //look at samples
         unsigned int GetSize(void);
 
         bool IsEmpty(void);
@@ -29,24 +29,24 @@ class CircBuff
 
         
         
-        const unsigned int max_size;          //size of buffer
-        const unsigned int max_index;
+        const unsigned int max_size;              //size of buffer
+        const unsigned int max_index;             //max index of buffer (size-1)
         volatile unsigned int head = 0;           //first element in buffer
-        volatile unsigned int tail = 0;           //last element in buffer              //needs to be mutex locked 
-        volatile unsigned int currentsize = 0;
+        volatile unsigned int tail = 0;           //last element in buffer             
+        volatile unsigned int currentsize = 0;    //buffer starts empty
         
 
-        char * name;
+        char * name; //buffer name
         
         sealsampleL4_t * Buffer; //pointer to buffer location when created by constructor
 
 
-        void IncrementHead(void);
-        void IncrementTail(void);
-        bool FullCheck();
-        bool EmptyCheck(void);
+        void IncrementHead(void); //increase head index by one
+        void IncrementTail(void); //increase tail index by one
+        bool FullCheck();         //check if buffer is full
+        bool EmptyCheck(void);    //check if buffer is empty
         
-        unsigned int getsize(void);
+        unsigned int getsize(void); //return current size of buffer
         //void IncrementPointer(unsigned int& pointer);
        
 
