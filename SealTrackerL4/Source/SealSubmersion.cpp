@@ -96,7 +96,7 @@ void SealSubmersion::SurfaceDetection()
         RestTimer.stop();
         RestTimer.reset();
         SetSealState(sealstate_t::CRUISING);
-        delay = (depth[NOW]*3650)/10; //the deeper the seal, the longer the delay is (example: 100m depth = (100*3000)/10 = 30000ms delay)
+        delay = (depth[NOW]*365); //the deeper the seal, the longer the delay is (example: 100m depth = (100*365) = 36500ms delay)
     }
 
     ThisThread::sleep_for(delay); //using deprecated functin because it's easy to do arithmetic on an integer
