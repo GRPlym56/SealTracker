@@ -47,7 +47,7 @@ class SealSubmersion
 
     int delay = 5000; //default delay 5000ms
 
-    LowPowerTimer RestTimer; //low power ;)
+    LowPowerTimer RestTimer; //low power ;), this wont lock deep sleep!
     
 
     sealstate_t SEAL_STATE;
