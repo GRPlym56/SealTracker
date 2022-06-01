@@ -91,7 +91,7 @@ void SealSubmersion::SurfaceDetection()
 
         delay = 5000; //moderate delay, dont want to miss a surfacing
         
-    }else //seal must be maintaining its course or has just dipped back in the water
+    }else //seal must be maintaining its course or has just slightly dipped back in the water
     {
         RestTimer.stop();
         RestTimer.reset();
@@ -99,7 +99,7 @@ void SealSubmersion::SurfaceDetection()
         delay = (depth[NOW]*365); //the deeper the seal, the longer the delay is (example: 100m depth = (100*365) = 36500ms delay)
     }
 
-    ThisThread::sleep_for(delay); //using deprecated functin because it's easy to do arithmetic on an integer
+    ThisThread::sleep_for(delay); //using deprecated function because it's easier to do arithmetic on an integer
 }
 
 void SealSubmersion::UpdateDepth() //measures current pressure value and updates depth
@@ -164,7 +164,7 @@ void SealSubmersion::SetSealState(sealstate_t newstate) //update state and put l
         sealsampleL4_t DiveSample; //new dive sample to go on characteristic dive buffer
         char timesample[32];
         time_t seconds = time(NULL); //get current time from the rtc
-        SEAL_STATE = newstate; //set member variable that main sampler thread can get
+        
         DiveSample.pressure = Pressure; //add pressure to sample
         DiveSample.temperature = Temperature; //add temp to sample
         strftime(timesample, 32, "%b:%d:%H:%M", localtime(&seconds)); //convert time to readable format
